@@ -835,6 +835,11 @@
       $('#onboarding-step-2').classList.add('hidden');
       $('#onboarding-modal').classList.remove('hidden');
     });
+    $('#btn-profile').addEventListener('click', () => {
+      $('#onboarding-step-1').classList.remove('hidden');
+      $('#onboarding-step-2').classList.add('hidden');
+      $('#onboarding-modal').classList.remove('hidden');
+    });
 
     // Auth
     $('#btn-signup').addEventListener('click', () => showAuthModal('signup'));
