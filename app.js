@@ -90,6 +90,7 @@
 
     let targetCalories = tdee;
     let protein = weight * 2.2; // roughly 1g per lb
+    let fats;
 
     if (goal === 'cut') {
       targetCalories -= 500;
