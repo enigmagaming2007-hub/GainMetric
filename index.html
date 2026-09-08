@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GainMetric — Track. Lift. Dominate.</title>
+  <meta name="description" content="GainMetric is the premium fitness dashboard to track your strength, macros, and body weight — all in one sleek, dark-mode interface." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ========== TOP NAV ========== -->
+  <nav id="main-nav" class="nav hidden">
+    <div class="nav-inner">
+      <a href="#dashboard" class="nav-logo">
+        <img src="logo_cropped.jpg" alt="GainMetric Logo" class="logo-img" />
+        <div class="nav-logo-text">Gain<span>Metric</span></div>
+      </a>
+      <div class="nav-links">
+        <a href="#dashboard" class="nav-link" data-page="dashboard">Dashboard</a>
+        <a href="#strength" class="nav-link" data-page="strength">Strength</a>
+        <a href="#macros" class="nav-link" data-page="macros">Macros</a>
+      </div>
+      <button id="btn-logout" class="btn btn-ghost btn-sm">Log Out</button>
+    </div>
+  </nav>
+
+  <!-- ========== PAGES ========== -->
+  <main id="app">
+
+    <!-- ——— LANDING PAGE ——— -->
+    <section id="page-landing" class="page">
+      <div class="landing">
+        <div class="landing-glow"></div>
+        <div class="landing-content">
+          <p class="landing-tag">THE FUTURE OF FITNESS TRACKING</p>
+          <h1 class="landing-headline">Track. Lift.<br/><span class="accent">Dominate.</span></h1>
+          <p class="landing-sub">One dashboard to log every rep, every macro, every pound. Built for lifters who demand precision and aesthetics.</p>
+          <div class="landing-actions">
+            <button id="btn-signup" class="btn btn-primary btn-lg">Get Started — It's Free</button>
+            <button id="btn-signin" class="btn btn-outline btn-lg">Sign In</button>
+          </div>
+          <div class="landing-stats">
+            <div class="landing-stat"><span class="accent">12K+</span><small>Active Lifters</small></div>
+            <div class="landing-stat"><span class="accent">1.4M</span><small>Workouts Logged</small></div>
+            <div class="landing-stat"><span class="accent">99.9%</span><small>Uptime</small></div>
+          </div>
+        </div>
+        <div class="landing-features">
+          <div class="feature-card">
+            <div class="feature-icon">🏋️</div>
+            <h3>Strength Tracker</h3>
+            <p>Log sets, reps, and weight for every exercise. Watch your PRs climb.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🥩</div>
+            <h3>Macro Tracker</h3>
+            <p>Hit your protein, carb, and fat targets daily with a smart food search.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Progress Dashboard</h3>
+            <p>Visualize your weight trend, daily summary, and lifetime stats at a glance.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ——— AUTH MODAL ——— -->
+    <div id="auth-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="auth-close">&times;</button>
+        <h2 id="auth-title">Create Account</h2>
+        <form id="auth-form" autocomplete="off">
+          <div class="form-group" id="auth-name-group">
+            <label for="auth-name">Full Name</label>
+            <input type="text" id="auth-name" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label for="auth-email">Email</label>
+            <input type="email" id="auth-email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="auth-pass">Password</label>
+            <input type="password" id="auth-pass" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="auth-submit">Create Account</button>
+          <p class="auth-toggle" id="auth-toggle-text"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ——— DASHBOARD ——— -->
+    <section id="page-dashboard" class="page hidden">
+      <div class="container">
+        <header class="page-header">
+          <div>
+            <h1>Welcome back, <span id="dash-username" class="accent">User</span></h1>
+            <p class="subtitle" id="dash-date"></p>
+          </div>
+        </header>
+
+        <!-- Quick Stats -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <small>Today's Calories</small>
+            <h2 id="dash-calories">0</h2>
+            <div class="stat-bar"><div class="stat-bar-fill" id="dash-cal-bar" style="width:0%"></div></div>
+          </div>
+          <div class="stat-card">
+            <small>Today's Protein</small>
+            <h2 id="dash-protein">0g</h2>
+            <div class="stat-bar"><div class="stat-bar-fill" id="dash-pro-bar" style="width:0%"></div></div>
+          </div>
+          <div class="stat-card">
+            <small>Workouts This Week</small>
+            <h2 id="dash-workouts">0</h2>
+            <p class="stat-detail" id="dash-workout-detail">Keep pushing!</p>
+          </div>
+          <div class="stat-card">
+            <small>Current Weight</small>
+            <h2 id="dash-weight">—</h2>
+            <p class="stat-detail" id="dash-weight-detail"></p>
+          </div>
+        </div>
+
+        <!-- Weight Graph -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3>Weight Progress</h3>
+            <div class="card-actions">
+              <input type="number" id="weight-input" placeholder="Enter weight (lbs)" step="0.1" class="input-sm" />
+              <button id="btn-log-weight" class="btn btn-primary btn-sm">Log Weight</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="weight-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <a href="#strength" class="action-card">
+            <span class="action-icon">🏋️</span>
+            <span>Log a Workout</span>
+            <span class="action-arrow">→</span>
+          </a>
+          <a href="#macros" class="action-card">
+            <span class="action-icon">🍽️</span>
+            <span>Log Food</span>
+            <span class="action-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ——— STRENGTH TRACKER ——— -->
+    <section id="page-strength" class="page hidden">
+      <div class="container">
+        <header class="page-header">
+          <div>
+            <h1>Strength <span class="accent">Tracker</span></h1>
+            <p class="subtitle">Log every set. Chase every PR.</p>
+          </div>
+        </header>
+
+        <div class="strength-layout">
+          <!-- Left: Log Form -->
+          <div class="card">
+            <h3>Log Exercise</h3>
+            <div class="form-group">
+              <label for="exercise-select">Exercise</label>
+              <select id="exercise-select">
+                <optgroup label="Chest">
+                  <option>Barbell Bench Press</option>
+                  <option>Incline Bench Press</option>
+                  <option>Decline Bench Press</option>
+                  <option>Dumbbell Bench Press</option>
+                  <option>Chest Flyes (Dumbbell)</option>
+                  <option>Chest Flyes (Cable)</option>
+                  <option>Chest Dips</option>
+                  <option>Cable Crossover</option>
+                </optgroup>
+                <optgroup label="Back">
+                  <option>Conventional Deadlift</option>
+                  <option>Sumo Deadlift</option>
+                  <option>Barbell Row</option>
+                  <option>Dumbbell Row</option>
+                  <option>T-Bar Row</option>
+                  <option>Pull-Up</option>
+                  <option>Chin-Up</option>
+                  <option>Lat Pulldown (Wide Grip)</option>
+                  <option>Lat Pulldown (Close Grip)</option>
+                  <option>Lat Pulldown (Neutral Grip)</option>
+                  <option>Seated Cable Row</option>
+                </optgroup>
+                <optgroup label="Legs">
+                  <option>Back Squat</option>
+                  <option>Front Squat</option>
+                  <option>Goblet Squat</option>
+                  <option>Leg Press</option>
+                  <option>Walking Lunges</option>
+                  <option>Bulgarian Split Squat</option>
+                  <option>Step-Ups</option>
+                  <option>Romanian Deadlift</option>
+                  <option>Hamstring Curl (Lying)</option>
+                  <option>Hamstring Curl (Seated)</option>
+                  <option>Hip Thrust</option>
+                  <option>Leg Extension</option>
+                  <option>Standing Calf Raise</option>
+                  <option>Seated Calf Raise</option>
+                </optgroup>
+                <optgroup label="Shoulders">
+                  <option>Overhead Press (Barbell)</option>
+                  <option>Overhead Press (Dumbbell)</option>
+                  <option>Lateral Raise</option>
+                  <option>Front Raise</option>
+                  <option>Face Pull</option>
+                  <option>Reverse Pec Deck</option>
+                </optgroup>
+                <optgroup label="Arms">
+                  <option>Barbell Bicep Curl</option>
+                  <option>Dumbbell Bicep Curl</option>
+                  <option>Hammer Curl</option>
+                  <option>Preacher Curl</option>
+                  <option>Cable Pressdown (Tricep)</option>
+                  <option>Skull Crusher</option>
+                  <option>Overhead Tricep Extension</option>
+                  <option>Concentration Curl</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div id="sets-container">
+              <div class="set-row">
+                <span class="set-label">Set 1</span>
+                <input type="number" placeholder="Reps" class="input-sm set-reps" min="1" />
+                <input type="number" placeholder="Weight (lbs)" class="input-sm set-weight" min="0" step="2.5" />
+              </div>
+            </div>
+            <div class="set-actions">
+              <button id="btn-add-set" class="btn btn-ghost btn-sm">+ Add Set</button>
+              <button id="btn-remove-set" class="btn btn-ghost btn-sm btn-danger">− Remove Set</button>
+            </div>
+            <button id="btn-log-exercise" class="btn btn-primary btn-block">Save Exercise</button>
+          </div>
+
+          <!-- Right: History -->
+          <div class="card">
+            <h3>Workout History</h3>
+            <div class="form-group">
+              <label for="history-filter">Filter by Exercise</label>
+              <select id="history-filter">
+                <option value="all">All Exercises</option>
+              </select>
+            </div>
+            <div id="workout-history" class="history-list">
+              <p class="empty-state">No workouts logged yet. Crush your first session!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ——— MACRO TRACKER ——— -->
+    <section id="page-macros" class="page hidden">
+      <div class="container">
+        <header class="page-header">
+          <div>
+            <h1>Macro <span class="accent">Tracker</span></h1>
+            <p class="subtitle">Fuel your gains. Hit your targets.</p>
+          </div>
+          <button id="btn-set-targets" class="btn btn-outline btn-sm">Set Targets</button>
+        </header>
+
+        <!-- Macro Rings -->
+        <div class="macro-rings">
+          <div class="ring-card">
+            <div class="ring-visual">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle cx="60" cy="60" r="52" class="ring-bg" />
+                <circle cx="60" cy="60" r="52" class="ring-fill ring-protein" id="ring-protein" />
+              </svg>
+              <div class="ring-center">
+                <span id="macro-protein-current">0</span>
+                <small>g</small>
+              </div>
+            </div>
+            <h4>Protein</h4>
+            <p class="ring-target">Target: <span id="macro-protein-target">180</span>g</p>
+          </div>
+          <div class="ring-card">
+            <div class="ring-visual">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle cx="60" cy="60" r="52" class="ring-bg" />
+                <circle cx="60" cy="60" r="52" class="ring-fill ring-carbs" id="ring-carbs" />
+              </svg>
+              <div class="ring-center">
+                <span id="macro-carbs-current">0</span>
+                <small>g</small>
+              </div>
+            </div>
+            <h4>Carbs</h4>
+            <p class="ring-target">Target: <span id="macro-carbs-target">250</span>g</p>
+          </div>
+          <div class="ring-card">
+            <div class="ring-visual">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle cx="60" cy="60" r="52" class="ring-bg" />
+                <circle cx="60" cy="60" r="52" class="ring-fill ring-fats" id="ring-fats" />
+              </svg>
+              <div class="ring-center">
+                <span id="macro-fats-current">0</span>
+                <small>g</small>
+              </div>
+            </div>
+            <h4>Fats</h4>
+            <p class="ring-target">Target: <span id="macro-fats-target">70</span>g</p>
+          </div>
+          <div class="ring-card ring-card-cal">
+            <div class="ring-visual">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle cx="60" cy="60" r="52" class="ring-bg" />
+                <circle cx="60" cy="60" r="52" class="ring-fill ring-calories" id="ring-calories" />
+              </svg>
+              <div class="ring-center">
+                <span id="macro-cal-current">0</span>
+                <small>kcal</small>
+              </div>
+            </div>
+            <h4>Calories</h4>
+            <p class="ring-target">Target: <span id="macro-cal-target">2400</span></p>
+          </div>
+        </div>
+
+        <!-- Food Search + Log -->
+        <div class="macro-layout">
+          <div class="card">
+            <h3>Search & Log Food</h3>
+            <div class="food-search-wrap">
+              <input type="text" id="food-search" placeholder="Search food (e.g., chicken breast, rice)..." class="input-lg" />
+              <button id="btn-food-search" class="btn btn-primary">Search</button>
+            </div>
+            <div id="food-results" class="food-results"></div>
+            <div class="custom-food-divider">
+              <span>or</span>
+            </div>
+            <button id="btn-custom-food" class="btn btn-outline btn-block">+ Create Custom Food</button>
+          </div>
+
+          <div class="card">
+            <h3>Today's Food Log</h3>
+            <div id="food-log" class="food-log">
+              <p class="empty-state">No food logged yet today. Start fueling!</p>
+            </div>
+            <div class="food-log-total" id="food-log-total"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ——— TARGETS MODAL ——— -->
+    <div id="targets-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="targets-close">&times;</button>
+        <h2>Set Daily Macro Targets</h2>
+        <form id="targets-form">
+          <div class="form-group">
+            <label for="target-protein">Protein (g)</label>
+            <input type="number" id="target-protein" value="180" min="0" />
+          </div>
+          <div class="form-group">
+            <label for="target-carbs">Carbs (g)</label>
+            <input type="number" id="target-carbs" value="250" min="0" />
+          </div>
+          <div class="form-group">
+            <label for="target-fats">Fats (g)</label>
+            <input type="number" id="target-fats" value="70" min="0" />
+          </div>
+          <div class="form-group">
+            <label for="target-calories">Calories (kcal)</label>
+            <input type="number" id="target-calories" value="2400" min="0" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Save Targets</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ——— FOOD LOG MODAL ——— -->
+    <div id="food-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="food-close">&times;</button>
+        <h2>Log Food</h2>
+        <p id="food-modal-name" class="food-modal-name"></p>
+        <form id="food-log-form">
+          <div class="form-group row-group">
+            <div style="flex: 1;">
+              <label for="food-servings">Quantity</label>
+              <input type="number" id="food-servings" value="1" min="0" step="0.1" />
+            </div>
+            <div style="flex: 1;">
+              <label for="food-unit">Unit</label>
+              <select id="food-unit" class="input-lg">
+                <option value="servings">Servings</option>
+                <option value="grams">Grams</option>
+              </select>
+            </div>
+          </div>
+          <div class="macro-preview" id="food-macro-preview"></div>
+          <button type="submit" class="btn btn-primary btn-block">Add to Log</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ——— CUSTOM FOOD MODAL ——— -->
+    <div id="custom-food-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-card-wide">
+        <button class="modal-close" id="custom-food-close">&times;</button>
+        <h2>Create Custom Food</h2>
+        <p class="modal-subtitle">Add your own food to your personal database for quick logging.</p>
+        <form id="custom-food-form" autocomplete="off">
+          <div class="form-row-2">
+            <div class="form-group form-group-grow">
+              <label for="custom-food-name">Food Name</label>
+              <input type="text" id="custom-food-name" placeholder="e.g., Homemade Protein Pancakes" required />
+            </div>
+            <div class="form-group">
+              <label for="custom-food-serving">Serving Size</label>
+              <input type="text" id="custom-food-serving" placeholder="e.g., 1 plate, 100g" required />
+            </div>
+          </div>
+          <div class="form-row-4">
+            <div class="form-group">
+              <label for="custom-food-calories">Calories</label>
+              <input type="number" id="custom-food-calories" placeholder="kcal" min="0" required />
+            </div>
+            <div class="form-group">
+              <label for="custom-food-protein">Protein (g)</label>
+              <input type="number" id="custom-food-protein" placeholder="g" min="0" step="0.1" required />
+            </div>
+            <div class="form-group">
+              <label for="custom-food-carbs">Carbs (g)</label>
+              <input type="number" id="custom-food-carbs" placeholder="g" min="0" step="0.1" required />
+            </div>
+            <div class="form-group">
+              <label for="custom-food-fats">Fats (g)</label>
+              <input type="number" id="custom-food-fats" placeholder="g" min="0" step="0.1" required />
+            </div>
+          </div>
+          <div class="custom-food-actions">
+            <button type="submit" class="btn btn-primary">Save to My Foods</button>
+          </div>
+        </form>
+        <div class="custom-foods-list-wrap">
+          <h3>My Custom Foods <span id="custom-food-count" class="badge">0</span></h3>
+          <div id="custom-foods-list" class="custom-foods-list">
+            <p class="empty-state">No custom foods yet. Create one above!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
