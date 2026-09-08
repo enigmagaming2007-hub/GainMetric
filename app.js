@@ -201,11 +201,11 @@
     const weights = store.get('weights', []);
     if (weights.length) {
       const last = weights[weights.length - 1];
-      $('#dash-weight').textContent = last.value + ' lbs';
+      $('#dash-weight').textContent = last.value + ' kg';
       if (weights.length > 1) {
         const diff = (last.value - weights[weights.length - 2].value).toFixed(1);
         const sign = diff > 0 ? '+' : '';
-        $('#dash-weight-detail').textContent = sign + diff + ' lbs from last entry';
+        $('#dash-weight-detail').textContent = sign + diff + ' kg from last entry';
       }
     } else {
       $('#dash-weight').textContent = '—';
@@ -245,7 +245,7 @@
       data: {
         labels,
         datasets: [{
-          label: 'Weight (lbs)',
+          label: 'Weight (kg)',
           data,
           borderColor: '#39ff14',
           backgroundColor: 'rgba(57,255,20,0.08)',
@@ -291,7 +291,7 @@
     store.set('weights', weights);
     input.value = '';
     renderDashboard();
-    toast('Weight logged: ' + val + ' lbs');
+    toast('Weight logged: ' + val + ' kg');
   }
 
   // ——— STRENGTH TRACKER ———
@@ -307,7 +307,7 @@
       <div class="set-row">
         <span class="set-label">Set 1</span>
         <input type="number" placeholder="Reps" class="input-sm set-reps" min="1" />
-        <input type="number" placeholder="Weight (lbs)" class="input-sm set-weight" min="0" step="2.5" />
+        <input type="number" placeholder="Weight (kg)" class="input-sm set-weight" min="0" step="2.5" />
       </div>`;
   }
 
@@ -319,7 +319,7 @@
     row.innerHTML = `
       <span class="set-label">Set ${count}</span>
       <input type="number" placeholder="Reps" class="input-sm set-reps" min="1" />
-      <input type="number" placeholder="Weight (lbs)" class="input-sm set-weight" min="0" step="2.5" />`;
+      <input type="number" placeholder="Weight (kg)" class="input-sm set-weight" min="0" step="2.5" />`;
     container.appendChild(row);
   }
 
