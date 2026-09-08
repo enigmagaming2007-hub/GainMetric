@@ -830,6 +830,11 @@
     // Onboarding
     $('#onboarding-form').addEventListener('submit', calculateTDEE);
     $('#ob-finish').addEventListener('click', finishOnboarding);
+    $('#btn-recalc-tdee').addEventListener('click', () => {
+      $('#onboarding-step-1').classList.remove('hidden');
+      $('#onboarding-step-2').classList.add('hidden');
+      $('#onboarding-modal').classList.remove('hidden');
+    });
 
     // Auth
     $('#btn-signup').addEventListener('click', () => showAuthModal('signup'));
@@ -881,10 +886,18 @@
 
     // Initial route
     const hash = window.location.hash.slice(1);
-    if (currentUser && pages.includes(hash)) {
-      navigate(hash);
-    } else if (currentUser) {
-      navigate('dashboard');
+    if (currentUser) {
+      if (!store.get('onboardingComplete', false)) {
+        $('#onboarding-step-1').classList.remove('hidden');
+        $('#onboarding-step-2').classList.add('hidden');
+        $('#onboarding-modal').classList.remove('hidden');
+      }
+      
+      if (pages.includes(hash)) {
+        navigate(hash);
+      } else {
+        navigate('dashboard');
+      }
     } else {
       navigate('landing');
     }
