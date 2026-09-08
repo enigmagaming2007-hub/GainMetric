@@ -499,3 +499,6 @@ select optgroup { color: var(--accent); font-weight: 600; }
   .macro-rings { grid-template-columns: 1fr; }
   .form-row-4 { grid-template-columns: 1fr; }
 }
+
+.btn-red { color: #ff3333; border-color: #ff3333; }
+.btn-red:hover { background: rgba(255, 51, 51, 0.1); color: #ff3333; }
