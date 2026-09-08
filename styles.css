@@ -419,6 +419,12 @@ select optgroup { color: var(--accent); font-weight: 600; }
   content: ''; flex: 1; height: 1px; background: var(--black-border);
 }
 .modal-card-wide { max-width: 580px; }
+.modal-lg { max-width: 500px; }
+.results-card { background: var(--black-bg); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--black-border); }
+.tdee-big { font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0 1.5rem; }
+.macro-split { display: flex; justify-content: center; gap: 1.5rem; }
+.macro-col { display: flex; flex-direction: column; gap: 0.25rem; font-size: 1.1rem; }
+.macro-col span { font-weight: 700; color: var(--text-primary); }
 .modal-subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; }
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }

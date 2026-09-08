@@ -64,6 +64,66 @@
     store.set('currentUser', currentUser);
     $('#auth-modal').classList.add('hidden');
     $('#auth-form').reset();
+    
+    if (!store.get('onboardingComplete', false)) {
+      $('#onboarding-modal').classList.remove('hidden');
+      $('#onboarding-step-1').classList.remove('hidden');
+      $('#onboarding-step-2').classList.add('hidden');
+    } else {
+      navigate('dashboard');
+      toast('Welcome, ' + currentUser.name + '!');
+    }
+  }
+
+  // ——— Onboarding & TDEE ———
+  function calculateTDEE(e) {
+    e.preventDefault();
+    const sex = $('#ob-sex').value;
+    const age = parseInt($('#ob-age').value);
+    const height = parseInt($('#ob-height').value);
+    const weight = parseInt($('#ob-weight').value);
+    const activity = parseFloat($('#ob-activity').value);
+    const goal = $('#ob-goal').value;
+
+    let bmr = (10 * weight) + (6.25 * height) - (5 * age) + (sex === 'M' ? 5 : -161);
+    let tdee = bmr * activity;
+
+    let targetCalories = tdee;
+    let protein = weight * 2.2; // roughly 1g per lb
+
+    if (goal === 'cut') {
+      targetCalories -= 500;
+      fats = (targetCalories * 0.25) / 9;
+    } else if (goal === 'bulk') {
+      targetCalories += 500;
+      fats = (targetCalories * 0.30) / 9;
+    } else {
+      fats = (targetCalories * 0.25) / 9;
+    }
+
+    const remCals = targetCalories - (protein * 4) - (fats * 9);
+    let carbs = remCals > 0 ? remCals / 4 : 0;
+
+    const targets = {
+      calories: Math.round(targetCalories),
+      protein: Math.round(protein),
+      fats: Math.round(fats),
+      carbs: Math.round(carbs)
+    };
+    store.set('macroTargets', targets);
+    store.set('onboardingComplete', true);
+
+    $('#ob-res-cals').textContent = targets.calories;
+    $('#ob-res-p').textContent = targets.protein + 'g';
+    $('#ob-res-c').textContent = targets.carbs + 'g';
+    $('#ob-res-f').textContent = targets.fats + 'g';
+
+    $('#onboarding-step-1').classList.add('hidden');
+    $('#onboarding-step-2').classList.remove('hidden');
+  }
+
+  function finishOnboarding() {
+    $('#onboarding-modal').classList.add('hidden');
     navigate('dashboard');
     toast('Welcome, ' + currentUser.name + '!');
   }
@@ -766,6 +826,10 @@
 
   // ——— Event Listeners ———
   function init() {
+    // Onboarding
+    $('#onboarding-form').addEventListener('submit', calculateTDEE);
+    $('#ob-finish').addEventListener('click', finishOnboarding);
+
     // Auth
     $('#btn-signup').addEventListener('click', () => showAuthModal('signup'));
     $('#btn-signin').addEventListener('click', () => showAuthModal('signin'));
