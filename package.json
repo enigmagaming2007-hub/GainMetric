@@ -1,0 +1,17 @@
+{
+  "name": "gainmetric",
+  "version": "1.0.0",
+  "description": "GainMetric — Track. Lift. Dominate.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "sql.js": "^1.11.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.4.5"
+  }
+}

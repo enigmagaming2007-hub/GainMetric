@@ -32,15 +32,39 @@
 
   // ——— Auth ———
   let currentUser = store.get('currentUser', null);
+  let authToken = store.get('authToken', null);
+  let currentAuthMode = 'signup';
+  let trialInfo = null;
+
+  function showAuthError(msg) {
+    const el = $('#auth-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function hideAuthError() {
+    const el = $('#auth-error');
+    el.textContent = '';
+    el.classList.add('hidden');
+  }
 
   function showAuthModal(mode = 'signup') {
+    currentAuthMode = mode;
     const modal = $('#auth-modal');
     const title = $('#auth-title');
     const nameGroup = $('#auth-name-group');
     const submit = $('#auth-submit');
     const toggle = $('#auth-toggle-text');
 
+    hideAuthError();
     modal.classList.remove('hidden');
+
+    // Reset Turnstile widget
+    if (window.turnstile) {
+      const widgetEl = $('#turnstile-widget');
+      if (widgetEl) turnstile.reset(widgetEl);
+    }
+
     if (mode === 'signup') {
       title.textContent = 'Create Account';
       nameGroup.classList.remove('hidden');
@@ -55,23 +79,128 @@
     $('#auth-switch').onclick = (e) => { e.preventDefault(); showAuthModal(mode === 'signup' ? 'signin' : 'signup'); };
   }
 
-  function handleAuth(e) {
+  async function handleAuth(e) {
     e.preventDefault();
+    hideAuthError();
+
     const name = $('#auth-name').value.trim() || 'Lifter';
     const email = $('#auth-email').value.trim();
-    if (!email) return;
-    currentUser = { name, email };
-    store.set('currentUser', currentUser);
-    $('#auth-modal').classList.add('hidden');
-    $('#auth-form').reset();
-    
-    if (!store.get('onboardingComplete', false)) {
-      $('#onboarding-modal').classList.remove('hidden');
-      $('#onboarding-step-1').classList.remove('hidden');
-      $('#onboarding-step-2').classList.add('hidden');
+    const password = $('#auth-pass').value;
+
+    if (!email || !password) {
+      showAuthError('Please fill in all fields');
+      return;
+    }
+    if (currentAuthMode === 'signup' && password.length < 6) {
+      showAuthError('Password must be at least 6 characters');
+      return;
+    }
+
+    // Get Turnstile token
+    let turnstileToken = '';
+    if (window.turnstile) {
+      turnstileToken = turnstile.getResponse($('#turnstile-widget'));
+      if (!turnstileToken) {
+        showAuthError('Please complete the verification');
+        return;
+      }
+    }
+
+    const submit = $('#auth-submit');
+    const originalText = submit.textContent;
+    submit.textContent = 'Please wait...';
+    submit.disabled = true;
+
+    try {
+      const endpoint = currentAuthMode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
+      const body = { email, password, turnstileToken };
+      if (currentAuthMode === 'signup') body.name = name;
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showAuthError(data.error || 'Something went wrong');
+        if (window.turnstile) turnstile.reset($('#turnstile-widget'));
+        return;
+      }
+
+      // Success — store token and user
+      authToken = data.token;
+      currentUser = data.user;
+      trialInfo = data.trial;
+      store.set('authToken', authToken);
+      store.set('currentUser', currentUser);
+
+      $('#auth-modal').classList.add('hidden');
+      $('#auth-form').reset();
+
+      // Check trial
+      if (trialInfo && trialInfo.trialExpired) {
+        showPaywall();
+        return;
+      }
+
+      updateTrialBanner();
+
+      if (!store.get('onboardingComplete', false)) {
+        $('#onboarding-modal').classList.remove('hidden');
+        $('#onboarding-step-1').classList.remove('hidden');
+        $('#onboarding-step-2').classList.add('hidden');
+      } else {
+        navigate('dashboard');
+        toast('Welcome, ' + currentUser.name + '!');
+      }
+    } catch (err) {
+      console.error('Auth error:', err);
+      showAuthError('Network error. Please try again.');
+    } finally {
+      submit.textContent = originalText;
+      submit.disabled = false;
+    }
+  }
+
+  function showPaywall() {
+    $('#paywall-modal').classList.remove('hidden');
+  }
+
+  function updateTrialBanner() {
+    const banner = $('#trial-banner');
+    if (!banner) return;
+    if (trialInfo && !trialInfo.isPaid && trialInfo.trialActive) {
+      banner.classList.remove('hidden');
+      $('#trial-days-left').textContent = trialInfo.daysRemaining;
     } else {
-      navigate('dashboard');
-      toast('Welcome, ' + currentUser.name + '!');
+      banner.classList.add('hidden');
+    }
+  }
+
+  async function checkAuthStatus() {
+    if (!authToken) return false;
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': 'Bearer ' + authToken }
+      });
+      if (!res.ok) {
+        // Token expired or invalid
+        authToken = null;
+        currentUser = null;
+        store.remove('authToken');
+        store.remove('currentUser');
+        return false;
+      }
+      const data = await res.json();
+      currentUser = data.user;
+      trialInfo = data.trial;
+      store.set('currentUser', currentUser);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -89,7 +218,7 @@
     let tdee = bmr * activity;
 
     let targetCalories = tdee;
-    let protein = weight * 2.2; // roughly 1g per lb
+    let protein = weight * 2.2; // ~2.2g per kg of bodyweight
     let fats;
 
     if (goal === 'cut') {
@@ -131,7 +260,10 @@
 
   function logout() {
     currentUser = null;
+    authToken = null;
+    trialInfo = null;
     store.remove('currentUser');
+    store.remove('authToken');
     navigate('landing');
     toast('Logged out');
   }
@@ -152,6 +284,7 @@
     nav.classList.toggle('hidden', page === 'landing');
 
     $$('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
+    $$('.bottom-nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
 
     window.location.hash = page === 'landing' ? '' : page;
 
@@ -378,7 +511,7 @@
           <small>${w.date} ${w.time || ''}</small>
         </div>
         <div class="history-sets">
-          ${w.sets.map((s, j) => `<span class="history-set-badge">${s.reps}×${s.weight}lb</span>`).join('')}
+          ${w.sets.map((s, j) => `<span class="history-set-badge">${s.reps}×${s.weight}kg</span>`).join('')}
         </div>
       </div>`).join('');
   }
@@ -826,7 +959,7 @@
   }
 
   // ——— Event Listeners ———
-  function init() {
+  async function init() {
     // Onboarding
     $('#onboarding-form').addEventListener('submit', calculateTDEE);
     $('#ob-finish').addEventListener('click', finishOnboarding);
@@ -840,68 +973,150 @@
       $('#onboarding-step-2').classList.add('hidden');
       $('#onboarding-modal').classList.remove('hidden');
     });
-
+    $('#btn-mobile-profile').addEventListener('click', () => {
+      $('#onboarding-step-1').classList.remove('hidden');
+      $('#onboarding-step-2').classList.add('hidden');
+      $('#onboarding-modal').classList.remove('hidden');
+        }
     // Auth
-    $('#btn-signup').addEventListener('click', () => showAuthModal('signup'));
-    $('#btn-signin').addEventListener('click', () => showAuthModal('signin'));
-    $('#auth-close').addEventListener('click', () => $('#auth-modal').classList.add('hidden'));
-    $('#auth-form').addEventListener('submit', handleAuth);
-    $('#btn-logout').addEventListener('click', logout);
+    #btn-signup.addEventListener('click', () => showAuthModal('signup'));
+    #btn-signin.addEventListener('click', () => showAuthModal('signin'));
+    #auth-close.addEventListener('click', () => #auth-modal.classList.add('hidden'));
+    #auth-form.addEventListener('submit', handleAuth);
+    #btn-logout.addEventListener('click', logout);
+
+    // Paywall
+    #btn-pay.addEventListener('click', async () => {
+      const phoneInput = #pay-phone;
+      const errEl = #paywall-error;
+      
+      if (!phoneInput || !phoneInput.value.trim() || phoneInput.value.length < 10) {
+        errEl.textContent = \'Please enter a valid 10-digit phone number.\';
+        errEl.style.display = \'block\';
+        return;
+      }
+      errEl.style.display = \'none\';
+
+      const btn = #btn-pay;
+      const origText = btn.textContent;
+      btn.textContent = \'Initializing...\';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(\'/api/payment/easebuzz/initiate\', {
+          method: \'POST\',
+          headers: {
+            \'Content-Type\': \'application/json\',
+            \'Authorization\': \'Bearer \' + authToken
+          },
+          body: JSON.stringify({ phone: phoneInput.value.trim() })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          errEl.textContent = data.error || \'Failed to initiate payment.\';
+          errEl.style.display = \'block\';
+          btn.textContent = origText;
+          btn.disabled = false;
+          return;
+        }
+
+        // Redirect to Easebuzz
+        window.location.href = \\https://testpay.easebuzz.in/pay/\\\;
+      } catch (err) {
+        console.error(\'Payment error\', err);
+        errEl.textContent = \'Network error. Please try again.\';
+        errEl.style.display = \'block\';
+        btn.textContent = origText;
+        btn.disabled = false;
+      }
+    });
+    #btn-paywall-logout.addEventListener('click', () => {
+      #paywall-modal.classList.add('hidden');
+      logout();
+    });
 
     // Dashboard
-    $('#btn-log-weight').addEventListener('click', logWeight);
-    $('#weight-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); logWeight(); } });
+    #btn-log-weight.addEventListener('click', logWeight);
+    #weight-input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); logWeight(); } });
 
     // Strength
-    $('#btn-add-set').addEventListener('click', addSet);
-    $('#btn-remove-set').addEventListener('click', removeSet);
-    $('#btn-log-exercise').addEventListener('click', logExercise);
-    $('#history-filter').addEventListener('change', renderWorkoutHistory);
+    #btn-add-set.addEventListener('click', addSet);
+    #btn-remove-set.addEventListener('click', removeSet);
+    #btn-log-exercise.addEventListener('click', logExercise);
+    #history-filter.addEventListener('change', renderWorkoutHistory);
 
     // Macros
-    $('#food-search').addEventListener('input', searchFood);
-    $('#btn-food-search').addEventListener('click', searchFood);
-    $('#food-search').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchFood(); } });
-    $('#btn-set-targets').addEventListener('click', () => $('#targets-modal').classList.remove('hidden'));
-    $('#targets-close').addEventListener('click', () => $('#targets-modal').classList.add('hidden'));
-    $('#targets-form').addEventListener('submit', saveTargets);
-    $('#food-close').addEventListener('click', () => $('#food-modal').classList.add('hidden'));
+    #food-search.addEventListener('input', searchFood);
+    #btn-food-search.addEventListener('click', searchFood);
+    #food-search.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchFood(); } });
+    #btn-set-targets.addEventListener('click', () => #targets-modal.classList.remove('hidden'));
+    #targets-close.addEventListener('click', () => #targets-modal.classList.add('hidden'));
+    #targets-form.addEventListener('submit', saveTargets);
+    #food-close.addEventListener('click', () => #food-modal.classList.add('hidden'));
 
     // Custom Food
-    $('#btn-custom-food').addEventListener('click', openCustomFoodModal);
-    $('#custom-food-close').addEventListener('click', () => $('#custom-food-modal').classList.add('hidden'));
-    $('#custom-food-form').addEventListener('submit', saveCustomFood);
-    $('#food-log-form').addEventListener('submit', logFood);
-    $('#food-servings').addEventListener('input', updateFoodPreview);
-    $('#food-unit').addEventListener('change', () => {
+    #btn-custom-food.addEventListener('click', openCustomFoodModal);
+    #custom-food-close.addEventListener('click', () => #custom-food-modal.classList.add('hidden'));
+    #custom-food-form.addEventListener('submit', saveCustomFood);
+    #food-log-form.addEventListener('submit', logFood);
+    #food-servings.addEventListener('input', updateFoodPreview);
+    #food-unit.addEventListener('change', () => {
       // Automatically adjust standard input value roughly depending on switch
-      const unit = $('#food-unit').value;
+      const unit = #food-unit.value;
       if (unit === 'grams') {
-        $('#food-servings').value = 100;
+        #food-servings.value = 100;
       } else {
-        $('#food-servings').value = 1;
+        #food-servings.value = 1;
       }
       updateFoodPreview();
     });
 
     // Close modals on backdrop
-    $$('.modal-overlay').forEach(m => {
+    ('.modal-overlay').forEach(m => {
       m.addEventListener('click', (e) => { if (e.target === m) m.classList.add('hidden'); });
     });
 
-    // Initial route
-    const hash = window.location.hash.slice(1);
-    if (currentUser) {
-      if (!store.get('onboardingComplete', false)) {
-        $('#onboarding-step-1').classList.remove('hidden');
-        $('#onboarding-step-2').classList.add('hidden');
-        $('#onboarding-modal').classList.remove('hidden');
-      }
-      
-      if (pages.includes(hash)) {
-        navigate(hash);
+    //  Initial auth check 
+    let hash = window.location.hash.slice(1);
+
+    if (hash === 'payment-success') {
+      toast(\'Payment successful! Welcome to Lifetime Access.\');
+      window.location.hash = \'dashboard\';
+      hash = \'dashboard\';
+    } else if (hash === 'payment-failure') {
+      toast(\'Payment failed. Please try again.\');
+      window.location.hash = \'dashboard\';
+      hash = \'dashboard\';
+    }
+
+    if (authToken) {
+      const valid = await checkAuthStatus();
+      if (valid) {
+        // Check trial
+        if (trialInfo && trialInfo.trialExpired) {
+          showPaywall();
+          return;
+        } else {
+          #paywall-modal.classList.add('hidden');
+        }
+
+        updateTrialBanner();
+
+        if (!store.get('onboardingComplete', false)) {
+          #onboarding-step-1.classList.remove('hidden');
+          #onboarding-step-2.classList.add('hidden');
+          #onboarding-modal.classList.remove('hidden');
+        }
+
+        if (pages.includes(hash)) {
+          navigate(hash);
+        } else {
+          navigate('dashboard');
+        }
       } else {
-        navigate('dashboard');
+        navigate('landing');
       }
     } else {
       navigate('landing');
