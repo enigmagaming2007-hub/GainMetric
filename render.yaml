@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: gainmetric
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: EASEBUZZ_KEY
+        sync: false
+      - key: EASEBUZZ_SALT
+        sync: false
+      - key: EASEBUZZ_ENV
+        value: test
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
