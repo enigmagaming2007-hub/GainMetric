@@ -1066,7 +1066,13 @@
               });
               const verifyData = await verifyRes.json();
               if (verifyRes.ok) {
-                window.location.hash = 'payment-success';
+                toast('Payment successful! Welcome to Premium Access.');
+                $('#paywall-modal').classList.add('hidden');
+                btn.textContent = origText;
+                btn.disabled = false;
+                await checkAuthStatus();
+                updateTrialBanner();
+                window.location.hash = 'dashboard';
               } else {
                 errEl.textContent = verifyData.error || 'Payment verification failed.';
                 errEl.style.display = 'block';
