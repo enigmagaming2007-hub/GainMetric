@@ -239,11 +239,11 @@ select optgroup { color: var(--accent); font-weight: 600; }
    ============================================================ */
 .page-header {
   display: flex; align-items: flex-end; justify-content: space-between;
-  flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem;
 }
 .stat-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem; margin-bottom: 1.5rem;
+  gap: 1.25rem; margin-bottom: 2.5rem;
 }
 .stat-card {
   background: var(--black-card); border: 1px solid var(--black-border);
@@ -267,12 +267,12 @@ select optgroup { color: var(--accent); font-weight: 600; }
 .stat-detail { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; }
 
 /* Chart */
-.chart-card { margin-bottom: 1.5rem; }
+.chart-card { margin-bottom: 2.5rem; }
 .chart-wrap { position: relative; height: 280px; }
 .chart-wrap canvas { width: 100% !important; }
 
 /* Quick Actions */
-.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2.5rem; }
 .action-card {
   display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem;
   background: var(--black-card); border: 1px solid var(--black-border);
@@ -766,6 +766,20 @@ input[type="number"], input[type="tel"], select, .btn {
   }
   .landing-actions .btn {
     width: 100%;
+  }
+
+  /* Increased horizontal spacing for widgets */
+  .quick-actions {
+    gap: 1.25rem;
+  }
+  .stat-grid {
+    gap: 1.25rem;
+  }
+  .action-card {
+    padding: 1.25rem 1rem;
+  }
+  .stat-card {
+    padding: 1.25rem 1.25rem;
   }
 }
 
