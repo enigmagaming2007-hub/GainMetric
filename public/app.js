@@ -437,8 +437,8 @@
     if (!val || val <= 0) return toast('Enter a valid weight');
     const weights = store.get('weights', []);
     weights.push({ date: today(), time: new Date().toISOString(), value: val });
-    if (weights.length > 20) {
-      weights.splice(0, weights.length - 20);
+    if (weights.length > 31) {
+      weights.splice(0, weights.length - 31);
     }
     store.set('weights', weights);
     input.value = '';
