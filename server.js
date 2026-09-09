@@ -253,7 +253,6 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
 });
 
 // ——— Payment Routes (Razorpay) ———
-const crypto = require('crypto');
 
 // 1. Create Order
 app.post('/api/payment/razorpay/create-order', authMiddleware, async (req, res) => {
