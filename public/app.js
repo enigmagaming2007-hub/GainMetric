@@ -165,8 +165,18 @@
     }
   }
 
-  function showPaywall() {
-    $('#paywall-modal').classList.remove('hidden');
+  function showPaywall(isVoluntaryUpgrade = false) {
+    const modal = $('#paywall-modal');
+    modal.classList.remove('hidden');
+    if (!isVoluntaryUpgrade) {
+      modal.dataset.locked = 'true';
+      $('.paywall-title').textContent = 'Trial Ended';
+      $('.paywall-sub').textContent = 'Your 10-day free trial has expired. Upgrade to keep tracking your gains.';
+    } else {
+      modal.dataset.locked = 'false';
+      $('.paywall-title').textContent = 'Upgrade to Premium ✨';
+      $('.paywall-sub').textContent = 'Unlock lifetime access and track your gains forever!';
+    }
   }
 
   function updateTrialBanner() {
@@ -1078,8 +1088,18 @@
 
     // Close modals on backdrop
     $$('.modal-overlay').forEach(m => {
-      m.addEventListener('click', (e) => { if (e.target === m) m.classList.add('hidden'); });
+      m.addEventListener('click', (e) => { 
+        if (e.target === m) {
+          if (m.id === 'paywall-modal' && m.dataset.locked === 'true') return;
+          m.classList.add('hidden'); 
+        }
+      });
     });
+
+    const upgradeBtn = $('#btn-upgrade-premium');
+    if (upgradeBtn) {
+      upgradeBtn.addEventListener('click', () => showPaywall(true));
+    }
 
     // ——— Initial auth check ———
     let hash = window.location.hash.slice(1);
