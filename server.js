@@ -1,15 +1,9 @@
-/* ============================================================
-   GainMetric — Express Backend
-   Auth (bcrypt + JWT), Cloudflare Turnstile, Trial System
-   ============================================================ */
-
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-const initSqlJs = require('sql.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 const app = express();
@@ -18,72 +12,33 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_dev_secret';
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAEtpxyu8YDxhWbIz8hjlDd12iyc';
 const TRIAL_DAYS = 10;
 const SALT_ROUNDS = 10;
-const DB_PATH = path.join(__dirname, 'data', 'gainmetric.db');
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_live_TZtU5DcRuhWq63';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '9GSXvB14ELszeNhCVpAEnRnU';
+const MONGODB_URI = process.env.MONGODB_URI || '';
 
 // ——— Middleware ———
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ——— Database ———
-let db;
+// ——— Mongoose Schemas ———
 
-function saveDb() {
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(DB_PATH, buffer);
-}
+const userSchema = new mongoose.Schema({
+  name: { type: String, default: 'Lifter' },
+  email: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+  },
+  password_hash: { type: String, required: true },
+  is_paid: { type: Number, default: 0 },
+  created_at: { type: Date, default: Date.now }
+});
 
-async function initDb() {
-  const SQL = await initSqlJs();
-
-  // Ensure data directory exists
-  const dbDir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
-  }
-
-  // Load existing DB or create new
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    db = new SQL.Database();
-  }
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      is_paid INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT (datetime('now'))
-    )
-  `);
-  saveDb();
-}
+const User = mongoose.model('User', userSchema);
 
 // ——— Helpers ———
-
-function dbGet(sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  if (stmt.step()) {
-    const row = stmt.getAsObject();
-    stmt.free();
-    return row;
-  }
-  stmt.free();
-  return null;
-}
-
-function dbRun(sql, params = []) {
-  db.run(sql, params);
-  saveDb();
-}
 
 async function verifyTurnstile(token, ip) {
   try {
@@ -106,14 +61,14 @@ async function verifyTurnstile(token, ip) {
 
 function generateToken(user) {
   return jwt.sign(
-    { id: user.id, email: user.email, name: user.name },
+    { id: user._id.toString(), email: user.email, name: user.name },
     JWT_SECRET,
     { expiresIn: '30d' }
   );
 }
 
 function getTrialStatus(user) {
-  const createdAt = new Date(user.created_at + 'Z');
+  const createdAt = new Date(user.created_at);
   const now = new Date();
   const diffMs = now - createdAt;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -150,7 +105,6 @@ app.post('/api/auth/signup', async (req, res) => {
   try {
     const { name, email, password, turnstileToken } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
@@ -158,39 +112,38 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    // Verify Turnstile
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const turnstileOk = await verifyTurnstile(turnstileToken, ip);
     if (!turnstileOk) {
       return res.status(403).json({ error: 'Bot verification failed. Please try again.' });
     }
 
-    // Check if user exists
-    const existing = dbGet('SELECT id FROM users WHERE email = ?', [email]);
+    const existing = await User.findOne({ email });
     if (existing) {
       return res.status(409).json({ error: 'An account with this email already exists' });
     }
 
-    // Hash password and create user
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    dbRun(
-      'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
-      [name || 'Lifter', email, passwordHash]
-    );
+    const user = new User({
+      name: name || 'Lifter',
+      email,
+      password_hash: passwordHash
+    });
+    
+    await user.save();
 
-    const user = dbGet('SELECT * FROM users WHERE email = ?', [email]);
     const token = generateToken(user);
     const trial = getTrialStatus(user);
 
     res.status(201).json({
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user._id.toString(), name: user.name, email: user.email },
       trial
     });
   } catch (err) {
     console.error('Signup error:', err);
-    if (err.message && err.message.includes('UNIQUE constraint')) {
-      return res.status(409).json({ error: 'An account with this email already exists' });
+    if (err.name === 'ValidationError') {
+       return res.status(400).json({ error: err.message });
     }
     res.status(500).json({ error: 'Server error' });
   }
@@ -205,20 +158,17 @@ app.post('/api/auth/signin', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Verify Turnstile
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const turnstileOk = await verifyTurnstile(turnstileToken, ip);
     if (!turnstileOk) {
       return res.status(403).json({ error: 'Bot verification failed. Please try again.' });
     }
 
-    // Find user
-    const user = dbGet('SELECT * FROM users WHERE email = ?', [email]);
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Verify password
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -229,7 +179,7 @@ app.post('/api/auth/signin', async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user._id.toString(), name: user.name, email: user.email },
       trial
     });
   } catch (err) {
@@ -239,17 +189,22 @@ app.post('/api/auth/signin', async (req, res) => {
 });
 
 // Get current user + trial status
-app.get('/api/auth/me', authMiddleware, (req, res) => {
-  const user = dbGet('SELECT * FROM users WHERE id = ?', [req.user.id]);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
+app.get('/api/auth/me', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-  const trial = getTrialStatus(user);
-  res.json({
-    user: { id: user.id, name: user.name, email: user.email },
-    trial
-  });
+    const trial = getTrialStatus(user);
+    res.json({
+      user: { id: user._id.toString(), name: user.name, email: user.email },
+      trial
+    });
+  } catch (err) {
+    console.error('Auth/me error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // ——— Payment Routes (Razorpay) ———
@@ -301,8 +256,7 @@ app.post('/api/payment/razorpay/verify', authMiddleware, async (req, res) => {
     const generated_signature = hmac.digest('hex');
     
     if (generated_signature === razorpay_signature) {
-      // Valid payment
-      dbRun('UPDATE users SET is_paid = 1 WHERE id = ?', [req.user.id]);
+      await User.findByIdAndUpdate(req.user.id, { is_paid: 1 });
       res.json({ success: true, message: 'Payment verified' });
     } else {
       res.status(400).json({ error: 'Payment signature mismatch' });
@@ -320,9 +274,23 @@ app.get('*', (req, res) => {
 
 // ——— Start ———
 async function start() {
-  await initDb();
+  if (!MONGODB_URI) {
+    console.error('MONGODB_URI is missing from environment variables');
+    process.exit(1);
+  }
+  
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log('✅ Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('❌ Failed to connect to MongoDB', err);
+    process.exit(1);
+  }
+  
   app.listen(PORT, () => {
-    console.log(`\n  🏋️  GainMetric server running at http://localhost:${PORT}\n`);
+    console.log(`
+  🏋️  GainMetric server running at http://localhost:${PORT}
+`);
   });
 }
 
