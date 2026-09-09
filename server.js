@@ -15,13 +15,13 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_dev_secret';
-const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY;
+const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA';
 const TRIAL_DAYS = 10;
 const SALT_ROUNDS = 10;
 const DB_PATH = path.join(__dirname, 'data', 'gainmetric.db');
 
-const EASEBUZZ_KEY = process.env.EASEBUZZ_KEY;
-const EASEBUZZ_SALT = process.env.EASEBUZZ_SALT;
+const EASEBUZZ_KEY = process.env.EASEBUZZ_KEY || '2PBP7IABZ2';
+const EASEBUZZ_SALT = process.env.EASEBUZZ_SALT || 'DAH88E3UWQ';
 const EASEBUZZ_ENV = process.env.EASEBUZZ_ENV || 'test';
 const EASEBUZZ_URL = EASEBUZZ_ENV === 'prod' ? 'https://pay.easebuzz.in' : 'https://testpay.easebuzz.in';
 
