@@ -977,37 +977,39 @@
       $('#onboarding-step-1').classList.remove('hidden');
       $('#onboarding-step-2').classList.add('hidden');
       $('#onboarding-modal').classList.remove('hidden');
-        }
+    });
+
+
     // Auth
-    #btn-signup.addEventListener('click', () => showAuthModal('signup'));
-    #btn-signin.addEventListener('click', () => showAuthModal('signin'));
-    #auth-close.addEventListener('click', () => #auth-modal.classList.add('hidden'));
-    #auth-form.addEventListener('submit', handleAuth);
-    #btn-logout.addEventListener('click', logout);
+    $('#btn-signup').addEventListener('click', () => showAuthModal('signup'));
+    $('#btn-signin').addEventListener('click', () => showAuthModal('signin'));
+    $('#auth-close').addEventListener('click', () => $('#auth-modal').classList.add('hidden'));
+    $('#auth-form').addEventListener('submit', handleAuth);
+    $('#btn-logout').addEventListener('click', logout);
 
     // Paywall
-    #btn-pay.addEventListener('click', async () => {
-      const phoneInput = #pay-phone;
-      const errEl = #paywall-error;
+    $('#btn-pay').addEventListener('click', async () => {
+      const phoneInput = $('#pay-phone');
+      const errEl = $('#paywall-error');
       
       if (!phoneInput || !phoneInput.value.trim() || phoneInput.value.length < 10) {
-        errEl.textContent = \'Please enter a valid 10-digit phone number.\';
-        errEl.style.display = \'block\';
+        errEl.textContent = 'Please enter a valid 10-digit phone number.';
+        errEl.style.display = 'block';
         return;
       }
-      errEl.style.display = \'none\';
+      errEl.style.display = 'none';
 
-      const btn = #btn-pay;
+      const btn = $('#btn-pay');
       const origText = btn.textContent;
-      btn.textContent = \'Initializing...\';
+      btn.textContent = 'Initializing...';
       btn.disabled = true;
 
       try {
-        const res = await fetch(\'/api/payment/easebuzz/initiate\', {
-          method: \'POST\',
+        const res = await fetch('/api/payment/easebuzz/initiate', {
+          method: 'POST',
           headers: {
-            \'Content-Type\': \'application/json\',
-            \'Authorization\': \'Bearer \' + authToken
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
           },
           body: JSON.stringify({ phone: phoneInput.value.trim() })
         });
@@ -1015,80 +1017,80 @@
         const data = await res.json();
         
         if (!res.ok) {
-          errEl.textContent = data.error || \'Failed to initiate payment.\';
-          errEl.style.display = \'block\';
+          errEl.textContent = data.error || 'Failed to initiate payment.';
+          errEl.style.display = 'block';
           btn.textContent = origText;
           btn.disabled = false;
           return;
         }
 
         // Redirect to Easebuzz
-        window.location.href = \\https://testpay.easebuzz.in/pay/\\\;
+        window.location.href = `https://testpay.easebuzz.in/pay/${data.access_key}`;
       } catch (err) {
-        console.error(\'Payment error\', err);
-        errEl.textContent = \'Network error. Please try again.\';
-        errEl.style.display = \'block\';
+        console.error('Payment error', err);
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.style.display = 'block';
         btn.textContent = origText;
         btn.disabled = false;
       }
     });
-    #btn-paywall-logout.addEventListener('click', () => {
-      #paywall-modal.classList.add('hidden');
+    $('#btn-paywall-logout').addEventListener('click', () => {
+      $('#paywall-modal').classList.add('hidden');
       logout();
     });
 
     // Dashboard
-    #btn-log-weight.addEventListener('click', logWeight);
-    #weight-input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); logWeight(); } });
+    $('#btn-log-weight').addEventListener('click', logWeight);
+    $('#weight-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); logWeight(); } });
 
     // Strength
-    #btn-add-set.addEventListener('click', addSet);
-    #btn-remove-set.addEventListener('click', removeSet);
-    #btn-log-exercise.addEventListener('click', logExercise);
-    #history-filter.addEventListener('change', renderWorkoutHistory);
+    $('#btn-add-set').addEventListener('click', addSet);
+    $('#btn-remove-set').addEventListener('click', removeSet);
+    $('#btn-log-exercise').addEventListener('click', logExercise);
+    $('#history-filter').addEventListener('change', renderWorkoutHistory);
 
     // Macros
-    #food-search.addEventListener('input', searchFood);
-    #btn-food-search.addEventListener('click', searchFood);
-    #food-search.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchFood(); } });
-    #btn-set-targets.addEventListener('click', () => #targets-modal.classList.remove('hidden'));
-    #targets-close.addEventListener('click', () => #targets-modal.classList.add('hidden'));
-    #targets-form.addEventListener('submit', saveTargets);
-    #food-close.addEventListener('click', () => #food-modal.classList.add('hidden'));
+    $('#food-search').addEventListener('input', searchFood);
+    $('#btn-food-search').addEventListener('click', searchFood);
+    $('#food-search').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchFood(); } });
+    $('#btn-set-targets').addEventListener('click', () => $('#targets-modal').classList.remove('hidden'));
+    $('#targets-close').addEventListener('click', () => $('#targets-modal').classList.add('hidden'));
+    $('#targets-form').addEventListener('submit', saveTargets);
+    $('#food-close').addEventListener('click', () => $('#food-modal').classList.add('hidden'));
 
     // Custom Food
-    #btn-custom-food.addEventListener('click', openCustomFoodModal);
-    #custom-food-close.addEventListener('click', () => #custom-food-modal.classList.add('hidden'));
-    #custom-food-form.addEventListener('submit', saveCustomFood);
-    #food-log-form.addEventListener('submit', logFood);
-    #food-servings.addEventListener('input', updateFoodPreview);
-    #food-unit.addEventListener('change', () => {
+    $('#btn-custom-food').addEventListener('click', openCustomFoodModal);
+    $('#custom-food-close').addEventListener('click', () => $('#custom-food-modal').classList.add('hidden'));
+    $('#custom-food-form').addEventListener('submit', saveCustomFood);
+    $('#food-log-form').addEventListener('submit', logFood);
+    $('#food-servings').addEventListener('input', updateFoodPreview);
+    $('#food-unit').addEventListener('change', () => {
       // Automatically adjust standard input value roughly depending on switch
-      const unit = #food-unit.value;
+      const unit = $('#food-unit').value;
       if (unit === 'grams') {
-        #food-servings.value = 100;
+        $('#food-servings').value = 100;
       } else {
-        #food-servings.value = 1;
+        $('#food-servings').value = 1;
       }
       updateFoodPreview();
     });
 
     // Close modals on backdrop
-    ('.modal-overlay').forEach(m => {
+    $$('.modal-overlay').forEach(m => {
       m.addEventListener('click', (e) => { if (e.target === m) m.classList.add('hidden'); });
     });
 
-    //  Initial auth check 
+    // ——— Initial auth check ———
     let hash = window.location.hash.slice(1);
 
     if (hash === 'payment-success') {
-      toast(\'Payment successful! Welcome to Lifetime Access.\');
-      window.location.hash = \'dashboard\';
-      hash = \'dashboard\';
+      toast('Payment successful! Welcome to Lifetime Access.');
+      window.location.hash = 'dashboard';
+      hash = 'dashboard';
     } else if (hash === 'payment-failure') {
-      toast(\'Payment failed. Please try again.\');
-      window.location.hash = \'dashboard\';
-      hash = \'dashboard\';
+      toast('Payment failed. Please try again.');
+      window.location.hash = 'dashboard';
+      hash = 'dashboard';
     }
 
     if (authToken) {
@@ -1099,15 +1101,15 @@
           showPaywall();
           return;
         } else {
-          #paywall-modal.classList.add('hidden');
+          $('#paywall-modal').classList.add('hidden');
         }
 
         updateTrialBanner();
 
         if (!store.get('onboardingComplete', false)) {
-          #onboarding-step-1.classList.remove('hidden');
-          #onboarding-step-2.classList.add('hidden');
-          #onboarding-modal.classList.remove('hidden');
+          $('#onboarding-step-1').classList.remove('hidden');
+          $('#onboarding-step-2').classList.add('hidden');
+          $('#onboarding-modal').classList.remove('hidden');
         }
 
         if (pages.includes(hash)) {
