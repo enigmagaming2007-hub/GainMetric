@@ -21,17 +21,22 @@
   }
 
   // ——— Storage ———
+  let currentUser = null;
   const store = {
+    _getKey(key) {
+      if (key === 'currentUser' || key === 'authToken') return 'gm_' + key;
+      return (currentUser && currentUser.id) ? 'gm_' + currentUser.id + '_' + key : 'gm_' + key;
+    },
     get(key, fallback = null) {
-      try { const v = localStorage.getItem('gm_' + key); return v ? JSON.parse(v) : fallback; }
+      try { const v = localStorage.getItem(this._getKey(key)); return v ? JSON.parse(v) : fallback; }
       catch { return fallback; }
     },
-    set(key, val) { localStorage.setItem('gm_' + key, JSON.stringify(val)); },
-    remove(key) { localStorage.removeItem('gm_' + key); }
+    set(key, val) { localStorage.setItem(this._getKey(key), JSON.stringify(val)); },
+    remove(key) { localStorage.removeItem(this._getKey(key)); }
   };
 
   // ——— Auth ———
-  let currentUser = store.get('currentUser', null);
+  currentUser = store.get('currentUser', null);
   let authToken = store.get('authToken', null);
   let currentAuthMode = 'signup';
   let trialInfo = null;
@@ -341,7 +346,7 @@
     $('#dash-workout-detail').textContent = uniqueDays >= 5 ? 'Beast mode! 💪' : uniqueDays >= 3 ? 'Solid week!' : 'Keep pushing!';
 
     // Current weight
-    const weights = store.get('weights_' + currentUser.id, []);
+    const weights = store.get('weights', []);
     if (weights.length) {
       const last = weights[weights.length - 1];
       $('#dash-weight').textContent = last.value + ' kg';
@@ -426,7 +431,7 @@
     const input = $('#weight-input');
     const val = parseFloat(input.value);
     if (!val || val <= 0) return toast('Enter a valid weight');
-    const weights = store.get('weights_' + currentUser.id, []);
+    const weights = store.get('weights', []);
     const existing = weights.findIndex(w => w.date === today());
     if (existing >= 0) {
       weights[existing].value = val;
@@ -437,7 +442,7 @@
     if (weights.length > 31) {
       weights.splice(0, weights.length - 31);
     }
-    store.set('weights_' + currentUser.id, weights);
+    store.set('weights', weights);
     input.value = '';
     renderDashboard();
     toast('Weight logged: ' + val + ' kg');
