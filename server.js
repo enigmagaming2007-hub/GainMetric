@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   password_hash: { type: String, required: true },
   is_paid: { type: Number, default: 0 },
+  app_data: { type: mongoose.Schema.Types.Mixed, default: {} },
   created_at: { type: Date, default: Date.now }
 });
 
@@ -137,7 +138,7 @@ app.post('/api/auth/signup', async (req, res) => {
 
     res.status(201).json({
       token,
-      user: { id: user._id.toString(), name: user.name, email: user.email },
+      user: { id: user._id.toString(), name: user.name, email: user.email, data: user.app_data || {} },
       trial
     });
   } catch (err) {
@@ -179,7 +180,7 @@ app.post('/api/auth/signin', async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id.toString(), name: user.name, email: user.email },
+      user: { id: user._id.toString(), name: user.name, email: user.email, data: user.app_data || {} },
       trial
     });
   } catch (err) {
@@ -198,11 +199,32 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
 
     const trial = getTrialStatus(user);
     res.json({
-      user: { id: user._id.toString(), name: user.name, email: user.email },
+      user: { id: user._id.toString(), name: user.name, email: user.email, data: user.app_data || {} },
       trial
     });
   } catch (err) {
     console.error('Auth/me error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Sync user data
+app.post('/api/user/data', authMiddleware, async (req, res) => {
+  try {
+    const { key, value } = req.body;
+    if (!key) return res.status(400).json({ error: 'Key is required' });
+    
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    if (!user.app_data) user.app_data = {};
+    user.app_data[key] = value;
+    user.markModified('app_data');
+    await user.save();
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Sync error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });

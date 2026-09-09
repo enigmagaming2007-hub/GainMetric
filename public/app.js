@@ -31,9 +31,37 @@
       try { const v = localStorage.getItem(this._getKey(key)); return v ? JSON.parse(v) : fallback; }
       catch { return fallback; }
     },
-    set(key, val) { localStorage.setItem(this._getKey(key), JSON.stringify(val)); },
+    set(key, val) { 
+      localStorage.setItem(this._getKey(key), JSON.stringify(val)); 
+      if (key !== 'currentUser' && key !== 'authToken' && currentUser && authToken) {
+        fetch('/api/user/data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+          body: JSON.stringify({ key, value: val })
+        }).catch(err => console.error('Sync error:', err));
+      }
+    },
     remove(key) { localStorage.removeItem(this._getKey(key)); }
   };
+
+  function syncFromServerData(dataObj) {
+    if (!dataObj || Object.keys(dataObj).length === 0) {
+      // First time cloud sync: Push existing local data to cloud
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k.startsWith('gm_' + currentUser.id + '_')) {
+           const originalKey = k.replace('gm_' + currentUser.id + '_', '');
+           // Call store.set to trigger the fetch upload
+           store.set(originalKey, JSON.parse(localStorage.getItem(k)));
+        }
+      }
+    } else {
+      // Overwrite local storage with cloud data
+      for (const [k, v] of Object.entries(dataObj)) {
+        localStorage.setItem(store._getKey(k), JSON.stringify(v));
+      }
+    }
+  }
 
   // ——— Auth ———
   currentUser = store.get('currentUser', null);
@@ -141,6 +169,10 @@
       trialInfo = data.trial;
       store.set('authToken', authToken);
       store.set('currentUser', currentUser);
+      
+      if (data.user && data.user.data) {
+        syncFromServerData(data.user.data);
+      }
 
       $('#auth-modal').classList.add('hidden');
       $('#auth-form').reset();
@@ -213,6 +245,11 @@
       currentUser = data.user;
       trialInfo = data.trial;
       store.set('currentUser', currentUser);
+      
+      if (data.user && data.user.data) {
+        syncFromServerData(data.user.data);
+      }
+      
       return true;
     } catch {
       return false;
