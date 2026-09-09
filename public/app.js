@@ -341,7 +341,7 @@
     $('#dash-workout-detail').textContent = uniqueDays >= 5 ? 'Beast mode! 💪' : uniqueDays >= 3 ? 'Solid week!' : 'Keep pushing!';
 
     // Current weight
-    const weights = store.get('weights', []);
+    const weights = store.get('weights_' + currentUser.id, []);
     if (weights.length) {
       const last = weights[weights.length - 1];
       $('#dash-weight').textContent = last.value + ' kg';
@@ -426,7 +426,7 @@
     const input = $('#weight-input');
     const val = parseFloat(input.value);
     if (!val || val <= 0) return toast('Enter a valid weight');
-    const weights = store.get('weights', []);
+    const weights = store.get('weights_' + currentUser.id, []);
     const existing = weights.findIndex(w => w.date === today());
     if (existing >= 0) {
       weights[existing].value = val;
@@ -437,7 +437,7 @@
     if (weights.length > 31) {
       weights.splice(0, weights.length - 31);
     }
-    store.set('weights', weights);
+    store.set('weights_' + currentUser.id, weights);
     input.value = '';
     renderDashboard();
     toast('Weight logged: ' + val + ' kg');
