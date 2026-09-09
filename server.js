@@ -252,106 +252,66 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
   });
 });
 
-// ——— Payment Routes (Easebuzz) ———
+// ——— Payment Routes (Razorpay) ———
+const crypto = require('crypto');
 
-// 1. Initiate Payment
-app.post('/api/payment/easebuzz/initiate', authMiddleware, async (req, res) => {
+// 1. Create Order
+app.post('/api/payment/razorpay/create-order', authMiddleware, async (req, res) => {
   try {
-    const { phone } = req.body;
-    if (!phone) {
-      return res.status(400).json({ error: 'Phone number is required' });
-    }
-
+    const amount = 2000; // ₹20.00 in paise
     const txnid = 'GM_' + Date.now() + '_' + req.user.id;
-    const amount = '20.0';
-    const productinfo = 'GainMetric Lifetime Access';
-    const firstname = req.user.name || 'User';
-    const email = req.user.email;
-
-    // Generate Hash
-    // Sequence: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10|salt
-    const hashString = [
-      EASEBUZZ_KEY, txnid, amount, productinfo, firstname, email,
-      '', '', '', '', '', '', '', '', '', '', // udf1 - udf10
-      EASEBUZZ_SALT
-    ].join('|');
-
-    const hash = crypto.createHash('sha512').update(hashString).digest('hex');
-
-    // SURL/FURL (will redirect back to our frontend callback)
-    const surl = `http://localhost:${PORT}/api/payment/easebuzz/success`;
-    const furl = `http://localhost:${PORT}/api/payment/easebuzz/failure`;
-
-    // Make request to Easebuzz
-    const params = new URLSearchParams({
-      key: EASEBUZZ_KEY,
-      txnid,
-      amount,
-      productinfo,
-      firstname,
-      phone,
-      email,
-      surl,
-      furl,
-      hash
-    });
-
-    const response = await fetch(`${EASEBUZZ_URL}/payment/initiateLink`, {
+    
+    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+    const response = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json'
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${auth}` 
       },
-      body: params
+      body: JSON.stringify({
+        amount: amount,
+        currency: 'INR',
+        receipt: txnid
+      })
     });
-
+    
     const data = await response.json();
-    if (data.status === 1) {
-      res.json({ access_key: data.data });
+    if (response.ok) {
+      res.json({ order_id: data.id, amount, currency: 'INR', key: RAZORPAY_KEY_ID });
     } else {
-      console.error('Easebuzz error:', data);
-      res.status(500).json({ error: 'Failed to initiate payment', details: data });
+      console.error('Razorpay Error:', data);
+      res.status(400).json({ error: data.error.description || 'Failed to create order' });
     }
   } catch (err) {
-    console.error('Payment initiation error:', err);
-    res.status(500).json({ error: 'Server error during payment initiation' });
+    console.error('Razorpay creation error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// 2. Success Webhook / Redirect
-app.post('/api/payment/easebuzz/success', express.urlencoded({ extended: true }), (req, res) => {
-  const data = req.body;
-  // Expected fields: status, firstname, amount, txnid, hash, etc.
-  
-  if (data.status === 'success') {
-    // Reverse hash to verify
-    // Sequence: salt|status||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key
-    const reverseHashString = [
-      EASEBUZZ_SALT, data.status, '', '', '', '', '', // udf10-udf6 are empty
-      data.udf5 || '', data.udf4 || '', data.udf3 || '', data.udf2 || '', data.udf1 || '',
-      data.email, data.firstname, data.productinfo, data.amount, data.txnid, EASEBUZZ_KEY
-    ].join('|');
+// 2. Verify Payment
+app.post('/api/payment/razorpay/verify', authMiddleware, async (req, res) => {
+  try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
     
-    const validHash = crypto.createHash('sha512').update(reverseHashString).digest('hex');
-    
-    if (validHash === data.hash) {
-      // Find user from txnid (e.g., GM_178..._1)
-      const userId = data.txnid.split('_').pop();
-      dbRun('UPDATE users SET is_paid = 1 WHERE id = ?', [userId]);
-      // Redirect back to frontend
-      return res.redirect('/#payment-success');
-    } else {
-      console.error('Easebuzz Hash mismatch');
-      return res.redirect('/#payment-failure');
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({ error: 'Missing payment details' });
     }
-  }
-  
-  res.redirect('/#payment-failure');
-});
 
-// 3. Failure Webhook / Redirect
-app.post('/api/payment/easebuzz/failure', express.urlencoded({ extended: true }), (req, res) => {
-  res.redirect('/#payment-failure');
+    const hmac = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET);
+    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+    const generated_signature = hmac.digest('hex');
+    
+    if (generated_signature === razorpay_signature) {
+      // Valid payment
+      dbRun('UPDATE users SET is_paid = 1 WHERE id = ?', [req.user.id]);
+      res.json({ success: true, message: 'Payment verified' });
+    } else {
+      res.status(400).json({ error: 'Payment signature mismatch' });
+    }
+  } catch (err) {
+    console.error('Razorpay verification error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // ——— Catch-all: serve index.html for SPA ———
