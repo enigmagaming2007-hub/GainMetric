@@ -766,3 +766,42 @@ input[type="number"], input[type="tel"], select, .btn {
     width: 100%;
   }
 }
+
+/* Shiny Golden Premium Button */
+.btn-premium {
+  background: linear-gradient(45deg, #FFDF00, #D4AF37, #FFDF00, #B8860B);
+  background-size: 300% 300%;
+  color: #111 !important;
+  font-weight: 800;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+  transition: all 0.3s ease;
+  animation: shinyGold 3s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-premium:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+}
+
+@keyframes shinyGold {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#btn-upgrade-premium {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  #btn-upgrade-premium {
+    margin-left: 0;
+    width: 100%;
+  }
+}
