@@ -20,8 +20,8 @@ const TRIAL_DAYS = 10;
 const SALT_ROUNDS = 10;
 const DB_PATH = path.join(__dirname, 'data', 'gainmetric.db');
 
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_TZsww2nVEvct8I';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'CVu2Vrm5uOpjfCBXu8fujSoA';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_live_TZtU5DcRuhWq63';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '9GSXvB14ELszeNhCVpAEnRnU';
 
 // ——— Middleware ———
 app.use(express.json());
