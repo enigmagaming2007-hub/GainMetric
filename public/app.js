@@ -175,7 +175,7 @@
     } else {
       modal.dataset.locked = 'false';
       $('.paywall-title').textContent = 'Upgrade to Premium ✨';
-      $('.paywall-sub').textContent = 'Unlock lifetime access and track your gains forever!';
+      $('.paywall-sub').textContent = 'Subscribe to Premium and track your gains!';
     }
   }
 
@@ -1105,7 +1105,7 @@
     let hash = window.location.hash.slice(1);
 
     if (hash === 'payment-success') {
-      toast('Payment successful! Welcome to Lifetime Access.');
+      toast('Payment successful! Welcome to Premium Access.');
       window.location.hash = 'dashboard';
       hash = 'dashboard';
     } else if (hash === 'payment-failure') {
