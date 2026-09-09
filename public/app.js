@@ -448,6 +448,14 @@
     toast('Weight logged: ' + val + ' kg');
   }
 
+  function clearGraph() {
+    if (confirm("Are you sure you want to clear your weight history?")) {
+      store.set('weights', []);
+      renderDashboard();
+      toast('Weight history cleared');
+    }
+  }
+
   // ——— STRENGTH TRACKER ———
   function renderStrength() {
     resetSets();
@@ -1129,6 +1137,7 @@
 
     // Dashboard
     $('#btn-log-weight').addEventListener('click', logWeight);
+    $('#btn-clear-graph').addEventListener('click', clearGraph);
     $('#weight-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); logWeight(); } });
 
     // Strength
