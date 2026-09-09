@@ -370,18 +370,9 @@
     const ctx = $('#weight-chart');
     if (!ctx) return;
 
-    // Count entries per date to decide whether to show time
-    const dateCounts = {};
-    weights.forEach(w => { dateCounts[w.date] = (dateCounts[w.date] || 0) + 1; });
-
     const labels = weights.map(w => {
-      const d = new Date(w.time || w.date);
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      if (dateCounts[w.date] > 1 && w.time) {
-        const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        return dateStr + ' ' + timeStr;
-      }
-      return dateStr;
+      const d = new Date(w.date);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     });
     const data = weights.map(w => w.value);
 
@@ -436,7 +427,13 @@
     const val = parseFloat(input.value);
     if (!val || val <= 0) return toast('Enter a valid weight');
     const weights = store.get('weights', []);
-    weights.push({ date: today(), time: new Date().toISOString(), value: val });
+    const existing = weights.findIndex(w => w.date === today());
+    if (existing >= 0) {
+      weights[existing].value = val;
+    } else {
+      weights.push({ date: today(), value: val });
+    }
+    
     if (weights.length > 31) {
       weights.splice(0, weights.length - 31);
     }
