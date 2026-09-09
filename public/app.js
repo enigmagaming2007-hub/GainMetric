@@ -62,7 +62,7 @@
     // Reset Turnstile widget
     if (window.turnstile) {
       const widgetEl = $('#turnstile-widget');
-      if (widgetEl) turnstile.reset(widgetEl);
+      if (widgetEl) turnstile.reset();
     }
 
     if (mode === 'signup') {
@@ -99,7 +99,7 @@
     // Get Turnstile token
     let turnstileToken = '';
     if (window.turnstile) {
-      turnstileToken = turnstile.getResponse($('#turnstile-widget'));
+      turnstileToken = turnstile.getResponse();
       if (!turnstileToken) {
         showAuthError('Please complete the verification');
         return;
@@ -126,7 +126,7 @@
 
       if (!res.ok) {
         showAuthError(data.error || 'Something went wrong');
-        if (window.turnstile) turnstile.reset($('#turnstile-widget'));
+        if (window.turnstile) turnstile.reset();
         return;
       }
 
