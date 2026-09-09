@@ -20,10 +20,8 @@ const TRIAL_DAYS = 10;
 const SALT_ROUNDS = 10;
 const DB_PATH = path.join(__dirname, 'data', 'gainmetric.db');
 
-const EASEBUZZ_KEY = process.env.EASEBUZZ_KEY || '2PBP7IABZ2';
-const EASEBUZZ_SALT = process.env.EASEBUZZ_SALT || 'DAH88E3UWQ';
-const EASEBUZZ_ENV = process.env.EASEBUZZ_ENV || 'test';
-const EASEBUZZ_URL = EASEBUZZ_ENV === 'prod' ? 'https://pay.easebuzz.in' : 'https://testpay.easebuzz.in';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_YourTestKeyId';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'YourTestKeySecret';
 
 // ——— Middleware ———
 app.use(express.json());

@@ -1016,13 +1016,12 @@
       btn.disabled = true;
 
       try {
-        const res = await fetch('/api/payment/easebuzz/initiate', {
+        const res = await fetch('/api/payment/razorpay/create-order', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + authToken
-          },
-          body: JSON.stringify({ phone: phoneInput.value.trim() })
+          }
         });
         
         const data = await res.json();
@@ -1035,8 +1034,69 @@
           return;
         }
 
-        // Redirect to Easebuzz
-        window.location.href = `https://testpay.easebuzz.in/pay/${data.access_key}`;
+        btn.textContent = 'Waiting for Payment...';
+
+        const options = {
+          key: data.key,
+          amount: data.amount,
+          currency: data.currency,
+          name: "GainMetric",
+          description: "Premium Subscription",
+          order_id: data.order_id,
+          prefill: {
+            contact: phoneInput.value.trim()
+          },
+          theme: {
+            color: "#4ade80"
+          },
+          handler: async function (response) {
+            btn.textContent = 'Verifying...';
+            try {
+              const verifyRes = await fetch('/api/payment/razorpay/verify', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + authToken
+                },
+                body: JSON.stringify({
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature
+                })
+              });
+              const verifyData = await verifyRes.json();
+              if (verifyRes.ok) {
+                window.location.hash = 'payment-success';
+              } else {
+                errEl.textContent = verifyData.error || 'Payment verification failed.';
+                errEl.style.display = 'block';
+                btn.textContent = origText;
+                btn.disabled = false;
+              }
+            } catch (err) {
+              errEl.textContent = 'Network error during verification.';
+              errEl.style.display = 'block';
+              btn.textContent = origText;
+              btn.disabled = false;
+            }
+          },
+          modal: {
+            ondismiss: function() {
+              btn.textContent = origText;
+              btn.disabled = false;
+            }
+          }
+        };
+        
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          errEl.textContent = response.error.description;
+          errEl.style.display = 'block';
+          btn.textContent = origText;
+          btn.disabled = false;
+        });
+        rzp.open();
+
       } catch (err) {
         console.error('Payment error', err);
         errEl.textContent = 'Network error. Please try again.';
