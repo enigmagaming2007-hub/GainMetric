@@ -682,6 +682,7 @@
     { name: 'Chili', calories: 250, protein: 7, carbs: 44, fats: 7 },
     { name: 'Dal (Lentil)', calories: 270, protein: 9, carbs: 45, fats: 6 },
     { name: 'Keema (Minced Meat)', calories: 320, protein: 14, carbs: 36, fats: 13 },
+    { name: 'Egg (Large)', calories: 72, protein: 6, carbs: 0, fats: 5 }
   ];
 
 
