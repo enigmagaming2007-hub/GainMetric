@@ -316,6 +316,21 @@
     $('#dash-username').textContent = currentUser.name.split(' ')[0];
     $('#dash-date').textContent = formatDate(today());
 
+    // Seed 10 days of sample weight data if none exists
+    if (!store.get('weights', []).length) {
+      const seed = [];
+      const base = 81;
+      for (let i = 9; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        d.setHours(8, 0, 0, 0);
+        const val = parseFloat((base - i * 0.2 + (Math.random() - 0.3) * 0.8).toFixed(1));
+        seed.push({ date: ds, time: d.toISOString(), value: val });
+      }
+      store.set('weights', seed);
+    }
+
     // Daily macros
     const macroLog = store.get('foodLog_' + today(), []);
     const totals = macroLog.reduce((acc, f) => {
