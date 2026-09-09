@@ -41,6 +41,12 @@ function saveDb() {
 async function initDb() {
   const SQL = await initSqlJs();
 
+  // Ensure data directory exists
+  const dbDir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+
   // Load existing DB or create new
   if (fs.existsSync(DB_PATH)) {
     const fileBuffer = fs.readFileSync(DB_PATH);
