@@ -15,7 +15,7 @@ const SALT_ROUNDS = 10;
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_live_TZtU5DcRuhWq63';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '9GSXvB14ELszeNhCVpAEnRnU';
-const MONGODB_URI = (process.env.MONGODB_URI || '').replace(/^["']|["']$/g, '');
+const MONGODB_URI = (process.env.MONGODB_URI || '').trim().replace(/^["']|["']$/g, '').trim();
 
 // ——— Middleware ———
 app.use(express.json());
