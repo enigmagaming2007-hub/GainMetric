@@ -243,6 +243,7 @@
       if (trialDaysLeft) trialDaysLeft.textContent = trialInfo.daysRemaining;
 
       if (trialInfo.isPaid) {
+        banner.classList.add('premium-banner');
         if (bannerEmoji) bannerEmoji.textContent = '🌟';
         if (bannerText) bannerText.textContent = 'Premium';
         if (bannerBadge) {
@@ -259,6 +260,7 @@
           }
         }
       } else {
+        banner.classList.remove('premium-banner');
         if (bannerEmoji) bannerEmoji.textContent = '🎉';
         if (bannerText) bannerText.textContent = 'Free trial';
         if (bannerBadge) {

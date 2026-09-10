@@ -596,6 +596,12 @@ select optgroup { color: var(--accent); font-weight: 600; }
   border-bottom: 1px solid rgba(57,255,20,0.15);
   padding: 0.6rem 1.5rem;
 }
+.trial-banner.premium-banner {
+  padding: 0.3rem 1.5rem;
+}
+.trial-banner.premium-banner .trial-banner-inner {
+  font-size: 0.75rem;
+}
 .trial-banner-inner {
   max-width: 1200px;
   margin: 0 auto;
