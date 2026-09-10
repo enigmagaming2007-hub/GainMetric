@@ -218,8 +218,13 @@
       $('.paywall-sub').textContent = 'Your 10-day free trial has expired. Upgrade to keep tracking your gains.';
     } else {
       modal.dataset.locked = 'false';
-      $('.paywall-title').textContent = 'Upgrade to Premium ✨';
-      $('.paywall-sub').textContent = 'Subscribe to Premium and track your gains!';
+      if (trialInfo && trialInfo.isPaid) {
+        $('.paywall-title').textContent = 'Extend Premium 🌟';
+        $('.paywall-sub').textContent = 'Add more time to your premium subscription.';
+      } else {
+        $('.paywall-title').textContent = 'Upgrade to Premium ✨';
+        $('.paywall-sub').textContent = 'Subscribe to Premium and track your gains!';
+      }
     }
   }
 
@@ -245,7 +250,14 @@
           bannerBadge.style.background = 'rgba(57, 255, 20, 0.2)';
           bannerBadge.style.color = 'var(--accent)';
         }
-        if (btnUpgrade) btnUpgrade.style.display = 'none';
+        if (btnUpgrade) {
+          if (trialInfo.daysRemaining < 365) {
+            btnUpgrade.style.display = 'inline-block';
+            btnUpgrade.textContent = 'Extend Plan';
+          } else {
+            btnUpgrade.style.display = 'none';
+          }
+        }
       } else {
         if (bannerEmoji) bannerEmoji.textContent = '🎉';
         if (bannerText) bannerText.textContent = 'Free trial';
