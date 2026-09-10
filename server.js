@@ -91,9 +91,16 @@ function getTrialStatus(user) {
         subDaysRemaining = Math.ceil(subDiffMs / (1000 * 60 * 60 * 24));
       }
     } else {
-      // Legacy users with is_paid but no expiration date get lifetime 
-      isPaid = true;
-      subDaysRemaining = 999;
+      // Legacy users with is_paid but no expiration date: Treat created_at as payment date
+      const subExpires = new Date(createdAt.getTime() + 31 * 24 * 60 * 60 * 1000);
+      const subDiffMs = subExpires - now;
+      if (subDiffMs > 0) {
+        isPaid = true;
+        subDaysRemaining = Math.ceil(subDiffMs / (1000 * 60 * 60 * 24));
+      } else {
+        isPaid = false;
+        subDaysRemaining = 0;
+      }
     }
   }
 
