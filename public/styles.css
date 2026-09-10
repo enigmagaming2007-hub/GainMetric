@@ -9,10 +9,10 @@
   --black-pure:    #000000;
   --black-deep:    #050505;
   --black-matte:   #0a0a0a;
-  --black-card:    #111111;
-  --black-raised:  #161616;
-  --black-border:  #1e1e1e;
-  --black-hover:   #222222;
+  --black-card:    rgba(17, 17, 17, 0.5);
+  --black-raised:  rgba(22, 22, 22, 0.5);
+  --black-border:  rgba(30, 30, 30, 0.6);
+  --black-hover:   rgba(34, 34, 34, 0.6);
 
   /* Neon accent — Lime Green */
   --accent:        #39ff14;
@@ -148,6 +148,7 @@ select optgroup { color: var(--accent); font-weight: 600; }
 .card {
   background: var(--black-card); border: 1px solid var(--black-border);
   border-radius: var(--radius); padding: 1.5rem;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   transition: border-color var(--transition);
 }
 .card:hover { border-color: #2a2a2a; }
@@ -259,8 +260,9 @@ select optgroup { color: var(--accent); font-weight: 600; }
   animation: particleFade var(--dur, 6s) infinite ease-in-out var(--del, 0s);
 }
 @keyframes particleFade {
-  0%, 100% { opacity: 0.15; }
-  50% { opacity: 0.6; }
+  0% { opacity: 0.15; transform: translate(0, 0); }
+  50% { opacity: 0.6; transform: translate(20px, -20px); }
+  100% { opacity: 0.15; transform: translate(0, 0); }
 }
 
 /* Animated Strength Background (Pulse Grid) */
@@ -289,8 +291,8 @@ select optgroup { color: var(--accent); font-weight: 600; }
   animation: pulseBar var(--dur) infinite ease-in-out var(--del);
 }
 @keyframes pulseBar {
-  0%, 100% { transform: scaleY(0.85); opacity: 0.2; }
-  50% { transform: scaleY(1); opacity: 0.4; }
+  0%, 100% { transform: scaleY(0.85) skewX(0deg); opacity: 0.2; }
+  50% { transform: scaleY(1) skewX(-3deg); opacity: 0.4; }
 }
 
 /* Animated Macros Background (Orbit Rings) */
@@ -334,6 +336,7 @@ select optgroup { color: var(--accent); font-weight: 600; }
   background: var(--black-card); border: 1px solid var(--black-border);
   border-radius: var(--radius-lg); padding: 2.5rem; width: 100%; max-width: 420px;
   position: relative;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 .modal-close {
   position: absolute; top: 1rem; right: 1.25rem;
@@ -360,6 +363,7 @@ select optgroup { color: var(--accent); font-weight: 600; }
 .stat-card {
   background: var(--black-card); border: 1px solid var(--black-border);
   border-radius: var(--radius); padding: 1.25rem 1.5rem;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   transition: border-color var(--transition);
 }
 .stat-card:hover { border-color: #2a2a2a; }
@@ -389,6 +393,7 @@ select optgroup { color: var(--accent); font-weight: 600; }
   display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem;
   background: var(--black-card); border: 1px solid var(--black-border);
   border-radius: var(--radius); transition: all var(--transition); cursor: pointer;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 .action-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(57,255,20,0.06); }
 .action-icon { font-size: 1.5rem; }
@@ -450,6 +455,7 @@ select optgroup { color: var(--accent); font-weight: 600; }
 .ring-card {
   background: var(--black-card); border: 1px solid var(--black-border);
   border-radius: var(--radius); padding: 1.5rem; text-align: center;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   transition: border-color var(--transition);
 }
 .ring-card:hover { border-color: #2a2a2a; }
