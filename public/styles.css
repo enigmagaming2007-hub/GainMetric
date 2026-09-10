@@ -252,15 +252,15 @@ select optgroup { color: var(--accent); font-weight: 600; }
 /* Animated Dashboard Background */
 .bg-data-field {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: -1; pointer-events: none; opacity: 0.5;
+  z-index: -1; pointer-events: none; opacity: 1;
 }
 .particle {
-  opacity: 0.1;
+  opacity: 0.15;
   animation: particleFade var(--dur, 6s) infinite ease-in-out var(--del, 0s);
 }
 @keyframes particleFade {
-  0%, 100% { opacity: 0.1; }
-  50% { opacity: 0.7; }
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.6; }
 }
 
 /* Animated Strength Background (Pulse Grid) */
@@ -272,7 +272,7 @@ select optgroup { color: var(--accent); font-weight: 600; }
 .bg-pulse-grid .glow {
   position: absolute; bottom: 10%; left: 50%;
   width: 400px; height: 400px; margin-left: -200px;
-  background: radial-gradient(circle, rgba(57,255,20,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(57,255,20,0.15) 0%, transparent 70%);
   animation: breathe 4s infinite ease-in-out;
 }
 @keyframes breathe {
@@ -285,12 +285,12 @@ select optgroup { color: var(--accent); font-weight: 600; }
 }
 .bg-pulse-grid .bar {
   width: 6px; height: 100%; background: var(--accent);
-  opacity: 0.15; transform-origin: bottom;
+  opacity: 0.3; transform-origin: bottom;
   animation: pulseBar var(--dur) infinite ease-in-out var(--del);
 }
 @keyframes pulseBar {
-  0%, 100% { transform: scaleY(0.4); opacity: 0.15; }
-  50% { transform: scaleY(1); opacity: 0.25; }
+  0%, 100% { transform: scaleY(0.85); opacity: 0.2; }
+  50% { transform: scaleY(1); opacity: 0.4; }
 }
 
 /* Animated Macros Background (Orbit Rings) */
@@ -302,11 +302,11 @@ select optgroup { color: var(--accent); font-weight: 600; }
 }
 .bg-orbit-rings .ring {
   position: absolute; border: 1px solid var(--accent);
-  border-radius: 50%; opacity: 0.12;
+  border-radius: 50%; opacity: 0.2;
 }
-.bg-orbit-rings .r1 { width: 600px; height: 600px; animation: rotateRight 40s linear infinite; }
-.bg-orbit-rings .r2 { width: 800px; height: 800px; animation: rotateLeft 55s linear infinite; }
-.bg-orbit-rings .r3 { width: 1000px; height: 1000px; animation: rotateRight 70s linear infinite; }
+.bg-orbit-rings .r1 { width: 600px; height: 600px; animation: rotateRight 15s linear infinite; }
+.bg-orbit-rings .r2 { width: 800px; height: 800px; animation: rotateLeft 20s linear infinite; }
+.bg-orbit-rings .r3 { width: 1000px; height: 1000px; animation: rotateRight 25s linear infinite; }
 .bg-orbit-rings .dot {
   position: absolute; top: -2px; left: 50%; width: 5px; height: 5px;
   border-radius: 50%; background: var(--accent);
