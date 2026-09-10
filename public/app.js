@@ -1113,6 +1113,17 @@
     $('#btn-logout').addEventListener('click', logout);
 
     // Paywall
+    let selectedPlanId = '1';
+    document.querySelectorAll('.paywall-plan').forEach(planEl => {
+      planEl.addEventListener('click', () => {
+        document.querySelectorAll('.paywall-plan').forEach(p => p.classList.remove('selected'));
+        planEl.classList.add('selected');
+        selectedPlanId = planEl.getAttribute('data-plan');
+        const price = planEl.getAttribute('data-price');
+        $('#btn-pay').textContent = `Pay ₹${price} to Continue`;
+      });
+    });
+
     $('#btn-pay').addEventListener('click', async () => {
       const phoneInput = $('#pay-phone');
       const errEl = $('#paywall-error');
@@ -1135,7 +1146,8 @@
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + authToken
-          }
+          },
+          body: JSON.stringify({ planId: selectedPlanId })
         });
         
         const data = await res.json();

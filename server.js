@@ -263,7 +263,17 @@ app.post('/api/user/data', authMiddleware, async (req, res) => {
 // 1. Create Order
 app.post('/api/payment/razorpay/create-order', authMiddleware, async (req, res) => {
   try {
-    const amount = 2000; // ₹20.00 in paise
+    const { planId } = req.body;
+    let amount = 2000;
+    let planDays = 31;
+    if (planId === '6') {
+      amount = 9900;
+      planDays = 186;
+    } else if (planId === '12') {
+      amount = 19900;
+      planDays = 372;
+    }
+
     const txnid = 'GM_' + Date.now() + '_' + req.user.id;
     
     const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
@@ -276,7 +286,8 @@ app.post('/api/payment/razorpay/create-order', authMiddleware, async (req, res) 
       body: JSON.stringify({
         amount: amount,
         currency: 'INR',
-        receipt: txnid
+        receipt: txnid,
+        notes: { plan_days: planDays }
       })
     });
     
@@ -307,7 +318,25 @@ app.post('/api/payment/razorpay/verify', authMiddleware, async (req, res) => {
     const generated_signature = hmac.digest('hex');
     
     if (generated_signature === razorpay_signature) {
-      const expiresAt = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000);
+      // Fetch order details from Razorpay to get the plan_days
+      const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+      const orderRes = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
+      const orderData = await orderRes.json();
+      let planDays = 31;
+      if (orderData && orderData.notes && orderData.notes.plan_days) {
+        planDays = parseInt(orderData.notes.plan_days) || 31;
+      }
+
+      const user = await User.findById(req.user.id);
+      let currentExpiresAt = Date.now();
+      if (user.subscription_expires_at && user.subscription_expires_at.getTime() > currentExpiresAt) {
+        currentExpiresAt = user.subscription_expires_at.getTime();
+      }
+      
+      const expiresAt = new Date(currentExpiresAt + planDays * 24 * 60 * 60 * 1000);
+      
       await User.findByIdAndUpdate(req.user.id, { 
         is_paid: 1,
         subscription_expires_at: expiresAt 

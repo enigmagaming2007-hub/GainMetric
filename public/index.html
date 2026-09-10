@@ -705,15 +705,26 @@
     <div class="paywall-icon">🔒</div>
     <h2 class="paywall-title">Trial Ended</h2>
     <p class="paywall-sub">Your 10-day free trial has expired. Upgrade to keep tracking your gains.</p>
-    <div class="paywall-price">
-      <span class="paywall-amount">₹20</span>
-      <span class="paywall-period">/ month</span>
+    
+    <div class="paywall-plans">
+      <div class="paywall-plan selected" data-plan="1" data-price="20">
+        <div class="plan-duration">1 Month</div>
+        <div class="plan-price">₹20</div>
+      </div>
+      <div class="paywall-plan" data-plan="6" data-price="99">
+        <div class="plan-duration">6 Months</div>
+        <div class="plan-price">₹99</div>
+      </div>
+      <div class="paywall-plan" data-plan="12" data-price="199">
+        <div class="plan-duration">12 Months</div>
+        <div class="plan-price">₹199</div>
+      </div>
     </div>
+
     <div class="form-group" style="margin-top: 1rem;">
       <input type="tel" id="pay-phone" placeholder="Enter phone number" class="input-lg" required />
     </div>
-    <button id="btn-pay" class="btn btn-primary btn-block btn-lg paywall-cta" style="margin-top: 0.5rem;">Pay ₹20 to
-      Continue</button>
+    <button id="btn-pay" class="btn btn-primary btn-block btn-lg paywall-cta" style="margin-top: 0.5rem;">Pay ₹20 to Continue</button>
     <p class="paywall-note" id="paywall-error" style="color: var(--danger); font-weight: 600; display: none;"></p>
     <p class="paywall-note">Secure payment · Instant access · All features</p>
     <button id="btn-paywall-logout" class="btn btn-ghost btn-sm" style="margin-top: 0.75rem;">Log Out</button>

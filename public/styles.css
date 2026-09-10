@@ -646,23 +646,43 @@ select optgroup { color: var(--accent); font-weight: 600; }
   line-height: 1.6;
   margin-bottom: 1.75rem;
 }
-.paywall-price {
+.paywall-plans {
   display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
-.paywall-amount {
+.paywall-plan {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background-color: var(--black-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.paywall-plan:hover {
+  border-color: rgba(57, 255, 20, 0.3);
+  background-color: rgba(57, 255, 20, 0.02);
+}
+.paywall-plan.selected {
+  border-color: var(--accent);
+  background-color: rgba(57, 255, 20, 0.05);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.15);
+}
+.plan-duration {
   font-family: 'Outfit', sans-serif;
-  font-size: 3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.plan-price {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
   font-weight: 900;
   color: var(--accent);
-  text-shadow: 0 0 30px rgba(57,255,20,0.3);
-}
-.paywall-period {
-  color: var(--text-muted);
-  font-size: 0.9rem;
 }
 .paywall-cta {
   font-size: 1.1rem;
