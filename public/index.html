@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18440322282"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'AW-18440322282');
@@ -14,23 +15,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>GainMatrix | Best Calorie & Fitness Tracker for Gym</title>
   <meta name="title" content="GainMatrix | Best Calorie & Fitness Tracker for Gym">
-  <meta name="description" content="Log in to GainMetric, the premium fitness tracker app for tracking workouts, weight loss, and muscle gain progress.">
-  <meta name="keywords" content="GainMatrix, calorie tracker, best calorie tracker, fitness tracker, gym tracker, workout log, macro calculator, bodybuilding diet, fitness app">
+  <meta name="description"
+    content="Log in to GainMetric, the premium fitness tracker app for tracking workouts, weight loss, and muscle gain progress.">
+  <meta name="keywords"
+    content="GainMatrix, calorie tracker, best calorie tracker, fitness tracker, gym tracker, workout log, macro calculator, bodybuilding diet, fitness app">
   <meta name="author" content="GainMatrix">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gainmetric.quest/">
   <meta property="og:title" content="GainMatrix | Best Calorie & Fitness Tracker for Gym">
-  <meta property="og:description" content="Track your calories, monitor gym workouts, and optimize your fitness journey with GainMatrix.">
+  <meta property="og:description"
+    content="Track your calories, monitor gym workouts, and optimize your fitness journey with GainMatrix.">
   <meta property="og:image" content="/logo_cropped.png">
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://gainmetric.quest/">
   <meta property="twitter:title" content="GainMatrix | Best Calorie & Fitness Tracker for Gym">
-  <meta property="twitter:description" content="Track your calories, monitor gym workouts, and optimize your fitness journey with GainMatrix.">
+  <meta property="twitter:description"
+    content="Track your calories, monitor gym workouts, and optimize your fitness journey with GainMatrix.">
   <meta property="twitter:image" content="/logo_cropped.png">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <link rel="stylesheet" href="styles.css" />
@@ -41,6 +48,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
 </head>
+
 <body>
   <!-- ========== TOP NAV ========== -->
   <nav id="main-nav" class="nav hidden">
@@ -51,15 +59,28 @@
       </a>
       <div class="nav-links">
         <a href="#dashboard" class="nav-link" data-page="dashboard">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
           <span>Dashboard</span>
         </a>
         <a href="#strength" class="nav-link" data-page="strength">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 5v14M2 12h20M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 5v14M18 5v14M2 12h20M2 9h4M2 15h4M18 9h4M18 15h4" />
+          </svg>
           <span>Strength</span>
         </a>
         <a href="#macros" class="nav-link" data-page="macros">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5" />
+          </svg>
           <span>Macros</span>
         </a>
       </div>
@@ -81,9 +102,11 @@
         <div class="landing-glow"></div>
         <div class="landing-content">
           <p class="landing-tag">THE FUTURE OF FITNESS TRACKING</p>
-          <h1 class="landing-headline">Track. Lift.<br/><span class="accent">Dominate.</span></h1>
-          <p class="landing-sub">One dashboard to log every rep, every macro, every kilo — built for lifters who demand precision and aesthetics.</p>
-          <p class="landing-supporting">Your all-in-one workout tracker and progressive overload tracker. Log every set and PR, track weight loss and muscle gain, and watch your progress compound.</p>
+          <h1 class="landing-headline">Track. Lift.<br /><span class="accent">Dominate.</span></h1>
+          <p class="landing-sub">One dashboard to log every rep, every macro, every kilo — built for lifters who demand
+            precision and aesthetics.</p>
+          <p class="landing-supporting">Your all-in-one workout tracker and progressive overload tracker. Log every set
+            and PR, track weight loss and muscle gain, and watch your progress compound.</p>
           <div class="landing-actions">
             <button id="btn-signup" class="btn btn-primary btn-lg">Get Started — It's Free</button>
             <button id="btn-signin" class="btn btn-outline btn-lg">Sign In</button>
@@ -94,9 +117,12 @@
       <div class="landing-stats-section">
         <div class="container">
           <div class="landing-stats">
-            <div class="landing-stat"><span class="accent count-up" data-target="12" data-suffix="K+">0</span><small>Active Lifters</small></div>
-            <div class="landing-stat"><span class="accent count-up" data-target="1.4" data-suffix="M" data-decimals="1">0</span><small>Workouts Logged</small></div>
-            <div class="landing-stat"><span class="accent count-up" data-target="99.9" data-suffix="%" data-decimals="1">0</span><small>Uptime</small></div>
+            <div class="landing-stat"><span class="accent count-up" data-target="12"
+                data-suffix="K+">0</span><small>Active Lifters</small></div>
+            <div class="landing-stat"><span class="accent count-up" data-target="1.4" data-suffix="M"
+                data-decimals="1">0</span><small>Workouts Logged</small></div>
+            <div class="landing-stat"><span class="accent count-up" data-target="99.9" data-suffix="%"
+                data-decimals="1">0</span><small>Uptime</small></div>
           </div>
         </div>
       </div>
@@ -126,7 +152,12 @@
       <div class="landing-seo-section">
         <div class="container" style="text-align: center; max-width: 800px; margin: 0 auto;">
           <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.5rem;">Welcome to GainMetric</h3>
-          <p class="seo-paragraph">GainMetric is the premium fitness tracker app built to help you stay consistent and see real results. Whether you're using it as a workout tracker app, a body measurement tracker, or a full-on progressive overload tracker, GainMetric gives you the tools to log every rep, set, and personal record in one place. Track your weight loss, muscle gain, and body composition over time with a fitness progress tracker designed for real training — not just numbers. Log in to pick up where you left off and keep building toward your goals.</p>
+          <p class="seo-paragraph">GainMetric is the premium fitness tracker app built to help you stay consistent and
+            see real results. Whether you're using it as a workout tracker app, a body measurement tracker, or a full-on
+            progressive overload tracker, GainMetric gives you the tools to log every rep, set, and personal record in
+            one place. Track your weight loss, muscle gain, and body composition over time with a fitness progress
+            tracker designed for real training — not just numbers. Log in to pick up where you left off and keep
+            building toward your goals.</p>
         </div>
       </div>
     </section>
@@ -150,7 +181,8 @@
             <input type="password" id="auth-pass" placeholder="••••••••" required />
           </div>
           <div class="turnstile-wrapper">
-            <div class="cf-turnstile" id="turnstile-widget" data-sitekey="0x4AAAAAAEtpx3bAe7N_w5VS" data-theme="dark"></div>
+            <div class="cf-turnstile" id="turnstile-widget" data-sitekey="0x4AAAAAAEtpx3bAe7N_w5VS" data-theme="dark">
+            </div>
           </div>
           <p id="auth-error" class="auth-error hidden"></p>
           <button type="submit" class="btn btn-primary btn-block" id="auth-submit">Create Account</button>
@@ -163,8 +195,9 @@
     <div id="onboarding-modal" class="modal-overlay hidden">
       <div class="modal-card modal-lg">
         <h2 id="onboarding-title">Set Your Targets</h2>
-        <p class="text-secondary" style="margin-bottom: 1.5rem; text-align: center;">Let's calculate your daily calorie and macro goals.</p>
-        
+        <p class="text-secondary" style="margin-bottom: 1.5rem; text-align: center;">Let's calculate your daily calorie
+          and macro goals.</p>
+
         <form id="onboarding-form" autocomplete="off">
           <div id="onboarding-step-1">
             <div class="form-row-2">
@@ -224,7 +257,7 @@
             <div class="results-card">
               <h3>Your Daily Plan</h3>
               <div class="tdee-big"><span id="ob-res-cals" class="accent">0</span> kcal</div>
-              
+
               <div class="macro-split">
                 <div class="macro-col">
                   <strong>Protein</strong>
@@ -240,8 +273,9 @@
                 </div>
               </div>
             </div>
-            
-            <button type="button" id="ob-finish" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Let's Go!</button>
+
+            <button type="button" id="ob-finish" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Let's
+              Go!</button>
           </div>
         </form>
       </div>
@@ -249,23 +283,6 @@
 
     <!-- ——— DASHBOARD ——— -->
     <section id="page-dashboard" class="page hidden">
-      <svg class="bg-data-field" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="none">
-        <line x1="15%" y1="20%" x2="25%" y2="40%" stroke="#39FF14" stroke-width="0.4" opacity="0.15" />
-        <line x1="75%" y1="15%" x2="85%" y2="30%" stroke="#39FF14" stroke-width="0.4" opacity="0.15" />
-        <line x1="85%" y1="30%" x2="80%" y2="50%" stroke="#39FF14" stroke-width="0.4" opacity="0.15" />
-        <circle cx="15%" cy="20%" r="2" fill="#39FF14" class="particle" style="--dur: 5s; --del: 0s;" />
-        <circle cx="25%" cy="40%" r="2" fill="#39FF14" class="particle" style="--dur: 7s; --del: 1s;" />
-        <circle cx="45%" cy="10%" r="2" fill="#39FF14" class="particle" style="--dur: 6s; --del: 2s;" />
-        <circle cx="65%" cy="60%" r="2" fill="#39FF14" class="particle" style="--dur: 8s; --del: 0.5s;" />
-        <circle cx="75%" cy="15%" r="2" fill="#39FF14" class="particle" style="--dur: 9s; --del: 1.5s;" />
-        <circle cx="85%" cy="30%" r="2" fill="#39FF14" class="particle" style="--dur: 5.5s; --del: 3s;" />
-        <circle cx="80%" cy="50%" r="2" fill="#39FF14" class="particle" style="--dur: 7.5s; --del: 0.2s;" />
-        <circle cx="10%" cy="70%" r="2" fill="#39FF14" class="particle" style="--dur: 6.5s; --del: 2.5s;" />
-        <circle cx="35%" cy="85%" r="2" fill="#39FF14" class="particle" style="--dur: 8.5s; --del: 1.2s;" />
-        <circle cx="55%" cy="90%" r="2" fill="#39FF14" class="particle" style="--dur: 6s; --del: 3.5s;" />
-        <circle cx="90%" cy="80%" r="2" fill="#39FF14" class="particle" style="--dur: 9s; --del: 0.8s;" />
-        <circle cx="5%" cy="45%" r="2" fill="#39FF14" class="particle" style="--dur: 7s; --del: 2.2s;" />
-      </svg>
       <!-- Trial Banner -->
       <div id="trial-banner" class="trial-banner hidden">
         <div class="trial-banner-inner" style="flex-wrap: wrap; gap: 0.75rem;">
@@ -273,7 +290,9 @@
             <span>🎉 Free trial: <strong id="trial-days-left">10</strong> days remaining</span>
             <span class="trial-badge" style="margin-left:0.5rem">FREE TRIAL</span>
           </div>
-          <button id="btn-upgrade-premium" class="btn btn-premium btn-sm" style="flex-direction: column; padding: 0.4rem 1rem; line-height: 1.2;"><span>Upgrade to Premium ✨</span><small style="font-size: 0.7em; opacity: 0.85;">just for ₹20</small></button>
+          <button id="btn-upgrade-premium" class="btn btn-premium btn-sm"
+            style="flex-direction: column; padding: 0.4rem 1rem; line-height: 1.2;"><span>Upgrade to Premium
+              ✨</span><small style="font-size: 0.7em; opacity: 0.85;">just for ₹20</small></button>
         </div>
       </div>
       <div class="container">
@@ -303,12 +322,16 @@
           <div class="stat-card">
             <small>Today's Calories</small>
             <h2 id="dash-calories">0</h2>
-            <div class="stat-bar"><div class="stat-bar-fill" id="dash-cal-bar" style="width:0%"></div></div>
+            <div class="stat-bar">
+              <div class="stat-bar-fill" id="dash-cal-bar" style="width:0%"></div>
+            </div>
           </div>
           <div class="stat-card">
             <small>Today's Protein</small>
             <h2 id="dash-protein">0g</h2>
-            <div class="stat-bar"><div class="stat-bar-fill" id="dash-pro-bar" style="width:0%"></div></div>
+            <div class="stat-bar">
+              <div class="stat-bar-fill" id="dash-pro-bar" style="width:0%"></div>
+            </div>
           </div>
           <div class="stat-card">
             <small>Workouts This Week</small>
@@ -343,6 +366,26 @@
 
     <!-- ——— STRENGTH TRACKER ——— -->
     <section id="page-strength" class="page hidden">
+      <div class="bg-pulse-grid">
+        <div class="glow"></div>
+        <div class="bars">
+          <div class="bar" style="--dur: 3.5s; --del: 0.1s;"></div>
+          <div class="bar" style="--dur: 2.8s; --del: 0.7s;"></div>
+          <div class="bar" style="--dur: 4.0s; --del: 0.3s;"></div>
+          <div class="bar" style="--dur: 2.5s; --del: 1.2s;"></div>
+          <div class="bar" style="--dur: 3.8s; --del: 0.5s;"></div>
+          <div class="bar" style="--dur: 2.9s; --del: 0.9s;"></div>
+          <div class="bar" style="--dur: 3.2s; --del: 1.5s;"></div>
+          <div class="bar" style="--dur: 2.6s; --del: 0.2s;"></div>
+          <div class="bar" style="--dur: 3.9s; --del: 1.1s;"></div>
+          <div class="bar" style="--dur: 2.7s; --del: 0.8s;"></div>
+          <div class="bar" style="--dur: 3.6s; --del: 1.4s;"></div>
+          <div class="bar" style="--dur: 3.1s; --del: 0.4s;"></div>
+          <div class="bar" style="--dur: 4.1s; --del: 1.0s;"></div>
+          <div class="bar" style="--dur: 2.8s; --del: 1.8s;"></div>
+          <div class="bar" style="--dur: 3.4s; --del: 0.6s;"></div>
+        </div>
+      </div>
       <div class="container">
         <header class="page-header">
           <div>
@@ -451,6 +494,11 @@
 
     <!-- ——— MACRO TRACKER ——— -->
     <section id="page-macros" class="page hidden">
+      <div class="bg-orbit-rings">
+        <div class="ring r1"></div>
+        <div class="ring r2"><div class="dot"></div></div>
+        <div class="ring r3"></div>
+      </div>
       <div class="container">
         <header class="page-header">
           <div>
@@ -528,7 +576,8 @@
           <div class="card">
             <h3>Search & Log Food</h3>
             <div class="food-search-wrap">
-              <input type="text" id="food-search" placeholder="Search food (e.g., chicken breast, rice)..." class="input-lg" />
+              <input type="text" id="food-search" placeholder="Search food (e.g., chicken breast, rice)..."
+                class="input-lg" />
               <button id="btn-food-search" class="btn btn-primary">Search</button>
             </div>
             <div id="food-results" class="food-results"></div>
@@ -638,62 +687,82 @@
             </div>
           </div>
           <div class="custom-food-actions">
+
 </html>
-            <button type="submit" class="btn btn-primary">Save to My Foods</button>
-          </div>
-        </form>
-        <div class="custom-foods-list-wrap">
-          <h3>My Custom Foods <span id="custom-food-count" class="badge">0</span></h3>
-          <div id="custom-foods-list" class="custom-foods-list">
-            <p class="empty-state">No custom foods yet. Create one above!</p>
-          </div>
-        </div>
-      </div>
+<button type="submit" class="btn btn-primary">Save to My Foods</button>
+</div>
+</form>
+<div class="custom-foods-list-wrap">
+  <h3>My Custom Foods <span id="custom-food-count" class="badge">0</span></h3>
+  <div id="custom-foods-list" class="custom-foods-list">
+    <p class="empty-state">No custom foods yet. Create one above!</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ——— PAYWALL MODAL ——— -->
+<div id="paywall-modal" class="modal-overlay hidden">
+  <div class="modal-card paywall-card">
+    <div class="paywall-icon">🔒</div>
+    <h2 class="paywall-title">Trial Ended</h2>
+    <p class="paywall-sub">Your 10-day free trial has expired. Upgrade to keep tracking your gains.</p>
+    <div class="paywall-price">
+      <span class="paywall-amount">₹20</span>
+      <span class="paywall-period">/ month</span>
     </div>
-
-    <!-- ——— PAYWALL MODAL ——— -->
-    <div id="paywall-modal" class="modal-overlay hidden">
-      <div class="modal-card paywall-card">
-        <div class="paywall-icon">🔒</div>
-        <h2 class="paywall-title">Trial Ended</h2>
-        <p class="paywall-sub">Your 10-day free trial has expired. Upgrade to keep tracking your gains.</p>
-        <div class="paywall-price">
-          <span class="paywall-amount">₹20</span>
-          <span class="paywall-period">/ month</span>
-        </div>
-        <div class="form-group" style="margin-top: 1rem;">
-          <input type="tel" id="pay-phone" placeholder="Enter phone number" class="input-lg" required />
-        </div>
-        <button id="btn-pay" class="btn btn-primary btn-block btn-lg paywall-cta" style="margin-top: 0.5rem;">Pay ₹20 to Continue</button>
-        <p class="paywall-note" id="paywall-error" style="color: var(--danger); font-weight: 600; display: none;"></p>
-        <p class="paywall-note">Secure payment · Instant access · All features</p>
-        <button id="btn-paywall-logout" class="btn btn-ghost btn-sm" style="margin-top: 0.75rem;">Log Out</button>
-      </div>
+    <div class="form-group" style="margin-top: 1rem;">
+      <input type="tel" id="pay-phone" placeholder="Enter phone number" class="input-lg" required />
     </div>
+    <button id="btn-pay" class="btn btn-primary btn-block btn-lg paywall-cta" style="margin-top: 0.5rem;">Pay ₹20 to
+      Continue</button>
+    <p class="paywall-note" id="paywall-error" style="color: var(--danger); font-weight: 600; display: none;"></p>
+    <p class="paywall-note">Secure payment · Instant access · All features</p>
+    <button id="btn-paywall-logout" class="btn btn-ghost btn-sm" style="margin-top: 0.75rem;">Log Out</button>
+  </div>
+</div>
 
-    <div id="toast-container"></div>
-  </main>
+<div id="toast-container"></div>
+</main>
 
-  <!-- ========== MOBILE BOTTOM NAV ========== -->
-  <nav id="mobile-bottom-nav" class="mobile-bottom-nav hidden">
-    <a href="#dashboard" class="bottom-nav-link" data-page="dashboard">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-      <span>Dash</span>
-    </a>
-    <a href="#strength" class="bottom-nav-link" data-page="strength">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 5v14M2 12h20M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>
-      <span>Strength</span>
-    </a>
-    <a href="#macros" class="bottom-nav-link" data-page="macros">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5"/></svg>
-      <span>Macros</span>
-    </a>
-    <a href="#" class="bottom-nav-link" id="btn-mobile-profile">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      <span>Profile</span>
-    </a>
-  </nav>
+<!-- ========== MOBILE BOTTOM NAV ========== -->
+<nav id="mobile-bottom-nav" class="mobile-bottom-nav hidden">
+  <a href="#dashboard" class="bottom-nav-link" data-page="dashboard">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"></rect>
+      <rect x="14" y="3" width="7" height="7"></rect>
+      <rect x="14" y="14" width="7" height="7"></rect>
+      <rect x="3" y="14" width="7" height="7"></rect>
+    </svg>
+    <span>Dash</span>
+  </a>
+  <a href="#strength" class="bottom-nav-link" data-page="strength">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 5v14M18 5v14M2 12h20M2 9h4M2 15h4M18 9h4M18 15h4" />
+    </svg>
+    <span>Strength</span>
+  </a>
+  <a href="#macros" class="bottom-nav-link" data-page="macros">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path
+        d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5" />
+    </svg>
+    <span>Macros</span>
+  </a>
+  <a href="#" class="bottom-nav-link" id="btn-mobile-profile">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+    <span>Profile</span>
+  </a>
+</nav>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
+
 </html>
