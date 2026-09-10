@@ -226,9 +226,36 @@
   function updateTrialBanner() {
     const banner = $('#trial-banner');
     if (!banner) return;
-    if (trialInfo && !trialInfo.isPaid && trialInfo.trialActive) {
+    
+    const bannerEmoji = $('#banner-emoji');
+    const bannerText = $('#banner-text');
+    const bannerBadge = $('#banner-badge');
+    const trialDaysLeft = $('#trial-days-left');
+    const btnUpgrade = $('#btn-upgrade-premium');
+
+    if (trialInfo && trialInfo.trialActive) {
       banner.classList.remove('hidden');
-      $('#trial-days-left').textContent = trialInfo.daysRemaining;
+      if (trialDaysLeft) trialDaysLeft.textContent = trialInfo.daysRemaining;
+
+      if (trialInfo.isPaid) {
+        if (bannerEmoji) bannerEmoji.textContent = '🌟';
+        if (bannerText) bannerText.textContent = 'Premium';
+        if (bannerBadge) {
+          bannerBadge.textContent = 'PREMIUM ACTIVE';
+          bannerBadge.style.background = 'rgba(57, 255, 20, 0.2)';
+          bannerBadge.style.color = 'var(--accent)';
+        }
+        if (btnUpgrade) btnUpgrade.style.display = 'none';
+      } else {
+        if (bannerEmoji) bannerEmoji.textContent = '🎉';
+        if (bannerText) bannerText.textContent = 'Free trial';
+        if (bannerBadge) {
+          bannerBadge.textContent = 'FREE TRIAL';
+          bannerBadge.style.background = 'rgba(255, 255, 255, 0.1)';
+          bannerBadge.style.color = '#fff';
+        }
+        if (btnUpgrade) btnUpgrade.style.display = 'flex';
+      }
     } else {
       banner.classList.add('hidden');
     }

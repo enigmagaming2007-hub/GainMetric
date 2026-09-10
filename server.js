@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   password_hash: { type: String, required: true },
   is_paid: { type: Number, default: 0 },
+  subscription_expires_at: { type: Date },
   app_data: { type: mongoose.Schema.Types.Mixed, default: {} },
   created_at: { type: Date, default: Date.now }
 });
@@ -71,16 +72,37 @@ function generateToken(user) {
 function getTrialStatus(user) {
   const createdAt = new Date(user.created_at);
   const now = new Date();
+  
+  // Free trial calculation
   const diffMs = now - createdAt;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const daysRemaining = Math.max(0, TRIAL_DAYS - diffDays);
   const trialActive = daysRemaining > 0;
 
+  // Premium subscription calculation
+  let subDaysRemaining = 0;
+  let isPaid = false;
+  
+  if (user.is_paid === 1) {
+    if (user.subscription_expires_at) {
+      const subDiffMs = new Date(user.subscription_expires_at) - now;
+      if (subDiffMs > 0) {
+        isPaid = true;
+        subDaysRemaining = Math.ceil(subDiffMs / (1000 * 60 * 60 * 24));
+      }
+    } else {
+      // Legacy users with is_paid but no expiration date get lifetime 
+      isPaid = true;
+      subDaysRemaining = 999;
+    }
+  }
+
   return {
-    trialActive: trialActive || user.is_paid === 1,
-    daysRemaining,
-    isPaid: user.is_paid === 1,
-    trialExpired: !trialActive && user.is_paid !== 1
+    trialActive: trialActive || isPaid,
+    daysRemaining: isPaid ? subDaysRemaining : daysRemaining,
+    isPaid,
+    trialExpired: !trialActive && !isPaid,
+    subDaysRemaining
   };
 }
 
@@ -278,7 +300,11 @@ app.post('/api/payment/razorpay/verify', authMiddleware, async (req, res) => {
     const generated_signature = hmac.digest('hex');
     
     if (generated_signature === razorpay_signature) {
-      await User.findByIdAndUpdate(req.user.id, { is_paid: 1 });
+      const expiresAt = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000);
+      await User.findByIdAndUpdate(req.user.id, { 
+        is_paid: 1,
+        subscription_expires_at: expiresAt 
+      });
       res.json({ success: true, message: 'Payment verified' });
     } else {
       res.status(400).json({ error: 'Payment signature mismatch' });
