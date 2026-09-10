@@ -597,21 +597,23 @@ select optgroup { color: var(--accent); font-weight: 600; }
   padding: 0.6rem 1.5rem;
 }
 .trial-banner.premium-banner {
-  padding: 0.15rem 1rem;
+  padding: 0.2rem 1rem;
   border-bottom: 1px solid rgba(57,255,20,0.08);
 }
 .trial-banner.premium-banner .trial-banner-inner {
-  font-size: 0.65rem;
-  opacity: 0.7;
+  font-size: 0.8rem;
+  opacity: 0.85;
 }
 .trial-banner.premium-banner .trial-badge {
-  font-size: 0.55rem;
-  padding: 0.1rem 0.4rem;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
 }
 .trial-banner.premium-banner .btn {
-  padding: 0.15rem 0.5rem;
-  font-size: 0.6rem;
-  opacity: 0.8;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  opacity: 0.9;
 }
 .trial-banner.premium-banner .btn:hover {
   opacity: 1;
