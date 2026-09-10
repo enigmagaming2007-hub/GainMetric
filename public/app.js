@@ -112,6 +112,13 @@
     $('#auth-switch').onclick = (e) => { e.preventDefault(); showAuthModal(mode === 'signup' ? 'signin' : 'signup'); };
   }
 
+  // Bind new nav signin/signup buttons
+  const navSignIn = $('#btn-nav-signin');
+  if (navSignIn) navSignIn.onclick = () => showAuthModal('signin');
+  const navSignUp = $('#btn-nav-signup');
+  if (navSignUp) navSignUp.onclick = () => showAuthModal('signup');
+
+
   async function handleAuth(e) {
     e.preventDefault();
     hideAuthError();
@@ -333,7 +340,31 @@
     });
 
     const nav = $('#main-nav');
-    nav.classList.toggle('hidden', page === 'landing');
+    if (nav) nav.classList.remove('hidden');
+
+    if (page === 'landing') {
+      const navLinks = $('.nav-links');
+      if (navLinks) navLinks.classList.add('hidden');
+      const btnProfile = $('#btn-profile');
+      if (btnProfile) btnProfile.classList.add('hidden');
+      const btnLogout = $('#btn-logout');
+      if (btnLogout) btnLogout.classList.add('hidden');
+      const btnNavSignIn = $('#btn-nav-signin');
+      if (btnNavSignIn) btnNavSignIn.classList.remove('hidden');
+      const btnNavSignUp = $('#btn-nav-signup');
+      if (btnNavSignUp) btnNavSignUp.classList.remove('hidden');
+    } else {
+      const navLinks = $('.nav-links');
+      if (navLinks) navLinks.classList.remove('hidden');
+      const btnProfile = $('#btn-profile');
+      if (btnProfile) btnProfile.classList.remove('hidden');
+      const btnLogout = $('#btn-logout');
+      if (btnLogout) btnLogout.classList.remove('hidden');
+      const btnNavSignIn = $('#btn-nav-signin');
+      if (btnNavSignIn) btnNavSignIn.classList.add('hidden');
+      const btnNavSignUp = $('#btn-nav-signup');
+      if (btnNavSignUp) btnNavSignUp.classList.add('hidden');
+    }
 
     $$('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     $$('.bottom-nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
@@ -1223,6 +1254,40 @@
     if (upgradeBtn) {
       upgradeBtn.addEventListener('click', () => showPaywall(true));
     }
+
+    // ——— Count-Up Animation ———
+    function initCountUp() {
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseFloat(el.getAttribute('data-target') || 0);
+            const suffix = el.getAttribute('data-suffix') || '';
+            const decimals = parseInt(el.getAttribute('data-decimals') || 0);
+            const duration = 2000;
+            let start = null;
+
+            function step(timestamp) {
+              if (!start) start = timestamp;
+              const progress = Math.min((timestamp - start) / duration, 1);
+              const ease = 1 - Math.pow(1 - progress, 4);
+              const current = (ease * target).toFixed(decimals);
+              el.textContent = current + suffix;
+              if (progress < 1) {
+                window.requestAnimationFrame(step);
+              } else {
+                el.textContent = target.toFixed(decimals) + suffix;
+              }
+            }
+            window.requestAnimationFrame(step);
+            obs.unobserve(el);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      $$('.count-up').forEach(el => observer.observe(el));
+    }
+    initCountUp();
 
     // ——— Initial auth check ———
     let hash = window.location.hash.slice(1);
