@@ -86,6 +86,9 @@
     const modal = $('#auth-modal');
     const title = $('#auth-title');
     const nameGroup = $('#auth-name-group');
+    const emailLabel = $('#auth-email-label');
+    const emailInput = $('#auth-email');
+    const phoneGroup = $('#auth-phone-group');
     const submit = $('#auth-submit');
     const toggle = $('#auth-toggle-text');
 
@@ -101,11 +104,17 @@
     if (mode === 'signup') {
       title.textContent = 'Create Account';
       nameGroup.classList.remove('hidden');
+      phoneGroup.classList.remove('hidden');
+      emailLabel.textContent = 'Email';
+      emailInput.placeholder = 'you@example.com';
       submit.textContent = 'Create Account';
       toggle.innerHTML = 'Already have an account? <a id="auth-switch" href="#">Sign In</a>';
     } else {
       title.textContent = 'Welcome Back';
       nameGroup.classList.add('hidden');
+      phoneGroup.classList.add('hidden');
+      emailLabel.textContent = 'Email or Phone';
+      emailInput.placeholder = 'Email or phone number';
       submit.textContent = 'Sign In';
       toggle.innerHTML = 'New here? <a id="auth-switch" href="#">Create Account</a>';
     }
@@ -124,12 +133,24 @@
     hideAuthError();
 
     const name = $('#auth-name').value.trim() || 'Lifter';
-    const email = $('#auth-email').value.trim();
+    const emailInputVal = $('#auth-email').value.trim();
+    const phoneInputVal = $('#auth-phone').value.trim();
     const password = $('#auth-pass').value;
 
-    if (!email || !password) {
-      showAuthError('Please fill in all fields');
-      return;
+    if (currentAuthMode === 'signup') {
+      if (!emailInputVal && !phoneInputVal) {
+        showAuthError('Please provide an email or phone number');
+        return;
+      }
+      if (!password) {
+        showAuthError('Please fill in password');
+        return;
+      }
+    } else {
+      if (!emailInputVal || !password) {
+        showAuthError('Please fill in all fields');
+        return;
+      }
     }
     if (currentAuthMode === 'signup' && password.length < 6) {
       showAuthError('Password must be at least 6 characters');
@@ -153,8 +174,14 @@
 
     try {
       const endpoint = currentAuthMode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
-      const body = { email, password, turnstileToken };
-      if (currentAuthMode === 'signup') body.name = name;
+      const body = { password, turnstileToken };
+      if (currentAuthMode === 'signup') {
+        body.name = name;
+        if (emailInputVal) body.email = emailInputVal;
+        if (phoneInputVal) body.phone = phoneInputVal;
+      } else {
+        body.identifier = emailInputVal;
+      }
 
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -1146,14 +1173,7 @@
     });
 
     $('#btn-pay').addEventListener('click', async () => {
-      const phoneInput = $('#pay-phone');
       const errEl = $('#paywall-error');
-      
-      if (!phoneInput || !phoneInput.value.trim() || phoneInput.value.length < 10) {
-        errEl.textContent = 'Please enter a valid 10-digit phone number.';
-        errEl.style.display = 'block';
-        return;
-      }
       errEl.style.display = 'none';
 
       const btn = $('#btn-pay');
@@ -1191,7 +1211,8 @@
           description: "Premium Subscription",
           order_id: data.order_id,
           prefill: {
-            contact: phoneInput.value.trim()
+            email: currentUser ? currentUser.email : '',
+            contact: currentUser ? currentUser.phone : ''
           },
           theme: {
             color: "#4ade80"

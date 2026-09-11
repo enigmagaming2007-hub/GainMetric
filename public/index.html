@@ -194,9 +194,13 @@
             <label for="auth-name">Full Name</label>
             <input type="text" id="auth-name" placeholder="Your name" />
           </div>
-          <div class="form-group">
-            <label for="auth-email">Email</label>
-            <input type="email" id="auth-email" placeholder="you@example.com" required />
+          <div class="form-group" id="auth-email-group">
+            <label for="auth-email" id="auth-email-label">Email</label>
+            <input type="text" id="auth-email" placeholder="you@example.com" />
+          </div>
+          <div class="form-group" id="auth-phone-group">
+            <label for="auth-phone">Phone Number</label>
+            <input type="tel" id="auth-phone" placeholder="Your phone number" />
           </div>
           <div class="form-group">
             <label for="auth-pass">Password</label>
@@ -722,9 +726,6 @@
       </div>
     </div>
 
-    <div class="form-group" style="margin-top: 1rem;">
-      <input type="tel" id="pay-phone" placeholder="Enter phone number" class="input-lg" required />
-    </div>
     <button id="btn-pay" class="btn btn-primary btn-block btn-lg paywall-cta" style="margin-top: 0.5rem;">Pay ₹20 to Continue</button>
     <p class="paywall-note" id="paywall-error" style="color: var(--danger); font-weight: 600; display: none;"></p>
     <p class="paywall-note">Secure payment · Instant access · All features</p>

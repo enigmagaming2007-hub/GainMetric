@@ -27,9 +27,14 @@ const userSchema = new mongoose.Schema({
   name: { type: String, default: 'Lifter' },
   email: { 
     type: String, 
-    required: true, 
+    sparse: true,
     unique: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+  },
+  phone: {
+    type: String,
+    sparse: true,
+    unique: true
   },
   password_hash: { type: String, required: true },
   is_paid: { type: Number, default: 0 },
@@ -133,10 +138,10 @@ function authMiddleware(req, res, next) {
 // Sign Up
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { name, email, password, turnstileToken } = req.body;
+    const { name, email, phone, password, turnstileToken } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+    if ((!email && !phone) || !password) {
+      return res.status(400).json({ error: 'Email or phone, and password are required' });
     }
     if (password.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
@@ -148,15 +153,20 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(403).json({ error: 'Bot verification failed. Please try again.' });
     }
 
-    const existing = await User.findOne({ email });
+    const orConditions = [];
+    if (email) orConditions.push({ email });
+    if (phone) orConditions.push({ phone });
+
+    const existing = await User.findOne({ $or: orConditions });
     if (existing) {
-      return res.status(409).json({ error: 'An account with this email already exists' });
+      return res.status(409).json({ error: 'An account with this email or phone number already exists' });
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const user = new User({
       name: name || 'Lifter',
-      email,
+      email: email || undefined,
+      phone: phone || undefined,
       password_hash: passwordHash
     });
     
@@ -167,7 +177,7 @@ app.post('/api/auth/signup', async (req, res) => {
 
     res.status(201).json({
       token,
-      user: { id: user._id.toString(), name: user.name, email: user.email, data: user.app_data || {} },
+      user: { id: user._id.toString(), name: user.name, email: user.email, phone: user.phone, data: user.app_data || {} },
       trial
     });
   } catch (err) {
@@ -182,10 +192,10 @@ app.post('/api/auth/signup', async (req, res) => {
 // Sign In
 app.post('/api/auth/signin', async (req, res) => {
   try {
-    const { email, password, turnstileToken } = req.body;
+    const { identifier, password, turnstileToken } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Email/Phone and password are required' });
     }
 
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -194,7 +204,9 @@ app.post('/api/auth/signin', async (req, res) => {
       return res.status(403).json({ error: 'Bot verification failed. Please try again.' });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ 
+      $or: [{ email: identifier }, { phone: identifier }] 
+    });
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -209,7 +221,7 @@ app.post('/api/auth/signin', async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id.toString(), name: user.name, email: user.email, data: user.app_data || {} },
+      user: { id: user._id.toString(), name: user.name, email: user.email, phone: user.phone, data: user.app_data || {} },
       trial
     });
   } catch (err) {
@@ -228,7 +240,7 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
 
     const trial = getTrialStatus(user);
     res.json({
-      user: { id: user._id.toString(), name: user.name, email: user.email, data: user.app_data || {} },
+      user: { id: user._id.toString(), name: user.name, email: user.email, phone: user.phone, data: user.app_data || {} },
       trial
     });
   } catch (err) {
