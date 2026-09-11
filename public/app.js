@@ -1127,6 +1127,13 @@
     $('#btn-logout').addEventListener('click', logout);
 
     // Paywall
+    const paywallCloseBtn = $('#paywall-close');
+    if (paywallCloseBtn) {
+      paywallCloseBtn.addEventListener('click', () => {
+        $('#paywall-modal').classList.add('hidden');
+      });
+    }
+
     let selectedPlanId = '1';
     document.querySelectorAll('.paywall-plan').forEach(planEl => {
       planEl.addEventListener('click', () => {
