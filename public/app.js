@@ -93,7 +93,7 @@
     const toggle = $('#auth-toggle-text');
 
     hideAuthError();
-    modal.classList.remove('hidden');
+    openModal(modal);
 
     // Reset Turnstile widget
     if (window.turnstile) {
@@ -208,7 +208,7 @@
         syncFromServerData(data.user.data);
       }
 
-      $('#auth-modal').classList.add('hidden');
+      closeModal($('#auth-modal'));
       $('#auth-form').reset();
 
       // Check trial
@@ -238,7 +238,7 @@
 
   function showPaywall(isVoluntaryUpgrade = false) {
     const modal = $('#paywall-modal');
-    modal.classList.remove('hidden');
+    openModal(modal);
     if (!isVoluntaryUpgrade) {
       modal.dataset.locked = 'true';
       $('.paywall-title').textContent = 'Trial Ended';
@@ -395,11 +395,45 @@
     toast('Logged out');
   }
 
+  // ——— Modals Helper ———
+  function openModal(modalEl) {
+    modalEl.classList.remove('hidden');
+    // Push a state so hardware back button can close it without navigating away
+    history.pushState({ modalOpen: true, id: modalEl.id }, '', window.location.hash || window.location.href);
+  }
+
+  function closeModal(modalEl) {
+    if (!modalEl.classList.contains('hidden')) {
+      modalEl.classList.add('hidden');
+      if (history.state && history.state.modalOpen && history.state.id === modalEl.id) {
+        history.back();
+      }
+    }
+  }
+
+  window.addEventListener('popstate', (e) => {
+    // If the hardware back button is pressed, ensure all non-locked modals are closed
+    $$('.modal-overlay').forEach(m => {
+      if (!(m.id === 'paywall-modal' && m.dataset.locked === 'true')) {
+        m.classList.add('hidden');
+      }
+    });
+  });
+
   // ——— Router ———
   const pages = ['landing', 'dashboard', 'strength', 'macros'];
 
   function navigate(page) {
     if (!page || !pages.includes(page)) page = 'landing';
+    
+    // Do not show landing page to logged-in users; send them to dashboard
+    if (page === 'landing' && currentUser) { 
+      page = 'dashboard';
+      if (window.location.hash !== '#dashboard') {
+        history.replaceState(null, '', '#dashboard');
+      }
+    }
+    
     if (page !== 'landing' && !currentUser) { page = 'landing'; }
 
     pages.forEach(p => {
@@ -445,6 +479,9 @@
   }
 
   window.addEventListener('hashchange', () => {
+    // Ignore hashchange if it was caused by a modal state push
+    if (history.state && history.state.modalOpen) return;
+    
     const hash = window.location.hash.slice(1) || 'landing';
     navigate(hash);
   });
@@ -943,7 +980,7 @@
     $('#food-modal-name').textContent = selectedFood.name;
     $('#food-servings').value = 1;
     updateFoodPreview();
-    $('#food-modal').classList.remove('hidden');
+    openModal($('#food-modal'));
   }
 
   function updateFoodPreview() {
@@ -982,7 +1019,7 @@
     log.push(entry);
     store.set(key, log);
 
-    $('#food-modal').classList.add('hidden');
+    closeModal($('#food-modal'));
     selectedFood = null;
     updateMacroRings();
     renderFoodLog();
@@ -1039,14 +1076,14 @@
       calories: parseInt($('#target-calories').value) || 2400,
     };
     store.set('macroTargets', targets);
-    $('#targets-modal').classList.add('hidden');
+    closeModal($('#targets-modal'));
     renderMacros();
     toast('Macro targets updated');
   }
 
   // ——— CUSTOM FOOD DATABASE ———
   function openCustomFoodModal() {
-    $('#custom-food-modal').classList.remove('hidden');
+    openModal($('#custom-food-modal'));
     renderCustomFoodsList();
   }
 
@@ -1106,7 +1143,7 @@
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.dataset.useCustom);
         selectedFood = customs[idx];
-        $('#custom-food-modal').classList.add('hidden');
+        closeModal($('#custom-food-modal'));
         openFoodModal();
       });
     });
@@ -1132,24 +1169,24 @@
     $('#btn-recalc-tdee').addEventListener('click', () => {
       $('#onboarding-step-1').classList.remove('hidden');
       $('#onboarding-step-2').classList.add('hidden');
-      $('#onboarding-modal').classList.remove('hidden');
+      openModal($('#onboarding-modal'));
     });
     $('#btn-profile').addEventListener('click', () => {
       $('#onboarding-step-1').classList.remove('hidden');
       $('#onboarding-step-2').classList.add('hidden');
-      $('#onboarding-modal').classList.remove('hidden');
+      openModal($('#onboarding-modal'));
     });
     $('#btn-mobile-profile').addEventListener('click', () => {
       $('#onboarding-step-1').classList.remove('hidden');
       $('#onboarding-step-2').classList.add('hidden');
-      $('#onboarding-modal').classList.remove('hidden');
+      openModal($('#onboarding-modal'));
     });
 
 
     // Auth
     $('#btn-signup').addEventListener('click', () => showAuthModal('signup'));
     $('#btn-signin').addEventListener('click', () => showAuthModal('signin'));
-    $('#auth-close').addEventListener('click', () => $('#auth-modal').classList.add('hidden'));
+    $('#auth-close').addEventListener('click', () => closeModal($('#auth-modal')));
     $('#auth-form').addEventListener('submit', handleAuth);
     $('#btn-logout').addEventListener('click', logout);
 
@@ -1157,7 +1194,7 @@
     const paywallCloseBtn = $('#paywall-close');
     if (paywallCloseBtn) {
       paywallCloseBtn.addEventListener('click', () => {
-        $('#paywall-modal').classList.add('hidden');
+        closeModal($('#paywall-modal'));
       });
     }
 
@@ -1235,7 +1272,7 @@
               const verifyData = await verifyRes.json();
               if (verifyRes.ok) {
                 toast('Payment successful! Welcome to Premium Access.');
-                $('#paywall-modal').classList.add('hidden');
+                closeModal($('#paywall-modal'));
                 btn.textContent = origText;
                 btn.disabled = false;
                 await checkAuthStatus();
@@ -1280,7 +1317,7 @@
       }
     });
     $('#btn-paywall-logout').addEventListener('click', () => {
-      $('#paywall-modal').classList.add('hidden');
+      closeModal($('#paywall-modal'));
       logout();
     });
 
@@ -1299,14 +1336,14 @@
     $('#food-search').addEventListener('input', searchFood);
     $('#btn-food-search').addEventListener('click', searchFood);
     $('#food-search').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchFood(); } });
-    $('#btn-set-targets').addEventListener('click', () => $('#targets-modal').classList.remove('hidden'));
-    $('#targets-close').addEventListener('click', () => $('#targets-modal').classList.add('hidden'));
+    $('#btn-set-targets').addEventListener('click', () => openModal($('#targets-modal')));
+    $('#targets-close').addEventListener('click', () => closeModal($('#targets-modal')));
     $('#targets-form').addEventListener('submit', saveTargets);
-    $('#food-close').addEventListener('click', () => $('#food-modal').classList.add('hidden'));
+    $('#food-close').addEventListener('click', () => closeModal($('#food-modal')));
 
     // Custom Food
     $('#btn-custom-food').addEventListener('click', openCustomFoodModal);
-    $('#custom-food-close').addEventListener('click', () => $('#custom-food-modal').classList.add('hidden'));
+    $('#custom-food-close').addEventListener('click', () => closeModal($('#custom-food-modal')));
     $('#custom-food-form').addEventListener('submit', saveCustomFood);
     $('#food-log-form').addEventListener('submit', logFood);
     $('#food-servings').addEventListener('input', updateFoodPreview);
@@ -1326,7 +1363,7 @@
       m.addEventListener('click', (e) => { 
         if (e.target === m) {
           if (m.id === 'paywall-modal' && m.dataset.locked === 'true') return;
-          m.classList.add('hidden'); 
+          closeModal(m); 
         }
       });
     });
@@ -1391,7 +1428,11 @@
           showPaywall();
           return;
         } else {
-          $('#paywall-modal').classList.add('hidden');
+          // ensure paywall is closed
+          const pm = $('#paywall-modal');
+          if (pm && !pm.classList.contains('hidden')) {
+             pm.classList.add('hidden');
+          }
         }
 
         updateTrialBanner();
@@ -1399,10 +1440,15 @@
         if (!store.get('onboardingComplete', false)) {
           $('#onboarding-step-1').classList.remove('hidden');
           $('#onboarding-step-2').classList.add('hidden');
-          $('#onboarding-modal').classList.remove('hidden');
+          openModal($('#onboarding-modal'));
         }
 
-        if (pages.includes(hash)) {
+        if (pages.includes(hash) && hash !== 'landing') {
+          // Ensure there is a dashboard state behind if opened directly to subpage
+          if (hash !== 'dashboard' && window.history.length <= 2) {
+             window.history.replaceState(null, '', '#dashboard');
+             window.history.pushState(null, '', '#' + hash);
+          }
           navigate(hash);
         } else {
           navigate('dashboard');
