@@ -3,6 +3,8 @@
   "short_name": "GM",
   "description": "GainMetric — Track. Lift. Dominate.",
   "start_url": "/",
+  "id": "/?source=pwa",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
