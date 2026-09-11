@@ -20,57 +20,57 @@
   "screenshots": [
     {
       "src": "/screenshot-1.png",
-      "sizes": "1920x1080",
+      "sizes": "485x814",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "narrow"
     },
     {
       "src": "/screenshot-2.png",
-      "sizes": "1920x1080",
+      "sizes": "476x818",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "narrow"
     },
     {
       "src": "/screenshot-3.png",
-      "sizes": "1080x1920",
+      "sizes": "475x815",
       "type": "image/png",
       "form_factor": "narrow"
     },
     {
       "src": "/screenshot-4.png",
-      "sizes": "1920x1080",
+      "sizes": "476x814",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "narrow"
     },
     {
       "src": "/screenshot-5.png",
-      "sizes": "1920x1080",
+      "sizes": "478x823",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "narrow"
     },
     {
       "src": "/screenshot-6.png",
-      "sizes": "1920x1080",
+      "sizes": "1919x928",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
       "src": "/screenshot-7.png",
-      "sizes": "1920x1080",
+      "sizes": "1919x930",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
       "src": "/screenshot-8.png",
-      "sizes": "1080x1920",
+      "sizes": "1919x927",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "wide"
     },
     {
       "src": "/screenshot-9.png",
-      "sizes": "1080x1920",
+      "sizes": "1919x930",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "wide"
     }
   ],
   "theme_color": "#ffffff",
