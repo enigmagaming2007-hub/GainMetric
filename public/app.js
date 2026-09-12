@@ -47,14 +47,23 @@
   function syncFromServerData(dataObj) {
     if (!dataObj || Object.keys(dataObj).length === 0) {
       // First time cloud sync: Push existing local data to cloud
+      const keysToMigrate = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
-        if (k.startsWith('gm_' + currentUser.id + '_')) {
-           const originalKey = k.replace('gm_' + currentUser.id + '_', '');
-           // Call store.set to trigger the fetch upload
-           store.set(originalKey, JSON.parse(localStorage.getItem(k)));
+        if (k.startsWith('gm_') && k !== 'gm_currentUser' && k !== 'gm_authToken') {
+           const potentialId = k.split('_')[1];
+           if (potentialId && potentialId.length === 24) continue;
+           keysToMigrate.push(k);
         }
       }
+      keysToMigrate.forEach(k => {
+        const originalKey = k.substring(3); // remove 'gm_'
+        try {
+          store.set(originalKey, JSON.parse(localStorage.getItem(k)));
+        } catch(e) {
+          console.error('Migration error', e);
+        }
+      });
     } else {
       // Overwrite local storage with cloud data
       for (const [k, v] of Object.entries(dataObj)) {
@@ -208,7 +217,7 @@
         syncFromServerData(data.user.data);
       }
 
-      closeModal($('#auth-modal'));
+      closeModal($('#auth-modal'), true);
       $('#auth-form').reset();
 
       // Check trial
@@ -220,7 +229,7 @@
       updateTrialBanner();
 
       if (!store.get('onboardingComplete', false)) {
-        $('#onboarding-modal').classList.remove('hidden');
+        openModal($('#onboarding-modal'));
         $('#onboarding-step-1').classList.remove('hidden');
         $('#onboarding-step-2').classList.add('hidden');
       } else {
@@ -380,7 +389,7 @@
   }
 
   function finishOnboarding() {
-    $('#onboarding-modal').classList.add('hidden');
+    closeModal($('#onboarding-modal'), true);
     navigate('dashboard');
     toast('Welcome, ' + currentUser.name + '!');
   }
@@ -402,10 +411,10 @@
     history.pushState({ modalOpen: true, id: modalEl.id }, '', window.location.hash || window.location.href);
   }
 
-  function closeModal(modalEl) {
+  function closeModal(modalEl, skipHistory = false) {
     if (!modalEl.classList.contains('hidden')) {
       modalEl.classList.add('hidden');
-      if (history.state && history.state.modalOpen && history.state.id === modalEl.id) {
+      if (!skipHistory && history.state && history.state.modalOpen && history.state.id === modalEl.id) {
         history.back();
       }
     }
@@ -1272,7 +1281,7 @@
               const verifyData = await verifyRes.json();
               if (verifyRes.ok) {
                 toast('Payment successful! Welcome to Premium Access.');
-                closeModal($('#paywall-modal'));
+                closeModal($('#paywall-modal'), true);
                 btn.textContent = origText;
                 btn.disabled = false;
                 await checkAuthStatus();
