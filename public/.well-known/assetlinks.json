@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "quest.gainmetric.twa",
-        "sha256_cert_fingerprints": ["12:27:14:BC:71:23:D2:1E:E8:5A:DB:2C:6E:99:36:34:5B:BB:12:A9:99:AC:1B:2E:98:92:64:96:8D:FE:9F:DB"]
+        "sha256_cert_fingerprints": ["1B:CA:63:00:04:A0:1E:09:BD:93:C7:18:2D:54:39:87:23:26:4C:1C:3B:0B:0E:E1:D4:15:EF:FE:8E:51:34:AB"]
       }
     }]
