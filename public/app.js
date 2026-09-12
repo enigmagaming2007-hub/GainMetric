@@ -228,12 +228,13 @@
 
       updateTrialBanner();
 
+      navigate('dashboard');
+
       if (!store.get('onboardingComplete', false)) {
         openModal($('#onboarding-modal'));
         $('#onboarding-step-1').classList.remove('hidden');
         $('#onboarding-step-2').classList.add('hidden');
       } else {
-        navigate('dashboard');
         toast('Welcome, ' + currentUser.name + '!');
       }
     } catch (err) {
